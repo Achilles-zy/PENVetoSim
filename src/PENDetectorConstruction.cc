@@ -175,7 +175,11 @@ void PENDetectorConstruction::DefineMat()
 	ReadScintPEN.open(Scint_file);
 	if (ReadScintPEN.is_open()) {
 		while (!ReadScintPEN.eof()) {
+
 			ReadScintPEN >> pWavelength >> PEN_EMISSION[nEntriesPEN];
+			if (ReadScintPEN.eof()) {
+				break;
+			}
 			PEN_WL_ENERGY[nEntriesPEN] = (1240. / pWavelength) * eV;//convert wavelength to eV
 		//G4cout<<nEntriesPEN<<" wl "<<PEN_WL_ENERGY[nEntriesPEN]<<" "<<PEN_EMISSION[nEntriesPEN]<<G4endl;
 			nEntriesPEN++;
@@ -216,7 +220,11 @@ void PENDetectorConstruction::DefineMat()
 	{
 		while (!ReadRindex.eof())
 		{
+
 			ReadRindex >> wavelength >> filler >> scintIndex[rindexEntries];
+			if (ReadRindex.eof()) {
+				break;
+			}
 			rindexEnergy[rindexEntries] = (1240. / wavelength) * eV;
 			rindexEntries++;
 		}
@@ -239,7 +247,11 @@ void PENDetectorConstruction::DefineMat()
 	{
 		while (!ReadScint.eof())
 		{
+
 			ReadScint >> wavelength >> filler >> scintEmit[scintEntries];
+			if (ReadScint.eof()) {
+				break;
+			}
 			//convert wavelength to eV:
 			scintEnergy[scintEntries] = (1240. / wavelength) * eV;
 			scintEmitSlow[scintEntries] = scintEmit[scintEntries];
@@ -263,7 +275,11 @@ void PENDetectorConstruction::DefineMat()
 	{
 		while (!ReadAbsorb.eof())
 		{
+
 			ReadAbsorb >> wavelength >> filler >> varAbsorbLength;
+			if (ReadAbsorb.eof()) {
+				break;
+			}
 			absorbEnergy[absorbEntries] = (1240 / wavelength) * eV;
 			Absorb[absorbEntries] = (varAbsorbLength)*m;
 			absorbEntries++;
@@ -286,7 +302,11 @@ void PENDetectorConstruction::DefineMat()
 	{
 		while (!ReadWLSScint.eof())
 		{
+
 			ReadWLSScint >> wavelength >> filler >> wlsEmit[500 - wlsScintEntries];
+			if (ReadWLSScint.eof()) {
+				break;
+			}
 			//convert wavelength to eV:
 			wlsEnergy[500 - wlsScintEntries] = (1240 / wavelength) * eV;
 			wlsScintEntries++;
@@ -309,6 +329,9 @@ void PENDetectorConstruction::DefineMat()
 		while (!ReadWLSAbsorb.eof())
 		{
 			ReadWLSAbsorb >> wavelength >> filler >> varAbsorbLength;
+			if (ReadWLSAbsorb.eof()) {
+				break;
+			}
 			wlsAbsorbEnergy[wlsAbsorbEntries] = (1240. / wavelength) * eV;
 			wlsAbsorb[wlsAbsorbEntries] = varAbsorbLength * mm;
 			wlsAbsorbEntries++;

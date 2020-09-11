@@ -132,11 +132,11 @@ void PENMaterials::Construct()
                                          3.e-18*pascal,
                                          2.73*kelvin);
     G4int vacEntries=0;
-    G4double vacEmit[500];
-    G4double vacIndex[500];
-    G4double vacAbsorb[500];
-    G4double vacEnergy[500];
-    G4double vacAbsorbconst=100*m;
+    G4double vacEmit[500] = { 0 };
+    G4double vacIndex[500] = { 0 };
+    G4double vacAbsorb[500] = { 0 };
+    G4double vacEnergy[500] = { 0 };
+    G4double vacAbsorbconst = 100 * m;
     G4double pWavelength;
     
     std::ifstream ReadVac;
@@ -146,7 +146,11 @@ void PENMaterials::Construct()
     if(ReadVac.is_open()){
         while(!ReadVac.eof()){
             G4String filler;
+
             ReadVac>>pWavelength>>filler>>vacEmit[vacEntries];
+            if (ReadVac.eof()) {
+                break;
+            }
             vacEnergy[vacEntries]=(1240/pWavelength)*eV; //convert wavelength to eV
             vacIndex[vacEntries]=1.0;
             vacAbsorb[vacEntries]=vacAbsorbconst;
@@ -176,9 +180,9 @@ void PENMaterials::Construct()
     
     G4int airEntries = 18;
     G4int air_ref_index_Entries = 0;
-    G4double air_ref_index_Energy[18];
-    G4double air_ref_index_value[18];
-    G4double airbulkAbsorb[18];
+    G4double air_ref_index_Energy[18] = { 0 };
+    G4double air_ref_index_value[18] = { 0 };
+    G4double airbulkAbsorb[18] = { 0 };
 
 
     std::ifstream Read_air_ref_index;
@@ -187,7 +191,11 @@ void PENMaterials::Construct()
     if(Read_air_ref_index.is_open()){
         while(!Read_air_ref_index.eof()){
             G4String filler;
+
             Read_air_ref_index >> pWavelength >> filler >> air_ref_index_value[air_ref_index_Entries];
+            if (Read_air_ref_index.eof()) {
+                break;
+            }
             air_ref_index_Energy[air_ref_index_Entries] = (1240/pWavelength)*eV;
             airbulkAbsorb[air_ref_index_Entries] = 1.0e6*mm;
             air_ref_index_Entries++;
@@ -404,16 +412,15 @@ void PENMaterials::Construct()
     Epoxy->AddElement(O,1);
     Epoxy->AddElement(Si,1);
     
-    G4double ref_index_Energy[500];
-    G4double ref_index_value[500];
-    ;
+    G4double ref_index_Energy[500] = { 0 };
+    G4double ref_index_value[500] = { 0 };
+    
     
     for (int i = 0; i < 500; i++){
         ref_index_Energy[i] = 0;
         ref_index_value[i] = 0;
     }
 
-    
     // Read scintillator refractive index
     G4int ref_index_Entries = 0;
     std::ifstream Read_ref_index;
@@ -423,7 +430,11 @@ void PENMaterials::Construct()
     if(Read_ref_index.is_open()){
         while(!Read_ref_index.eof()){
             G4String filler;
+
             Read_ref_index >> pWavelength >> filler >> ref_index_value[ref_index_Entries];
+            if (Read_ref_index.eof()) {
+                break;
+            }
             ref_index_Energy[ref_index_Entries] = (1240/pWavelength)*eV;
             ref_index_Entries++;
         }
@@ -502,11 +513,11 @@ void PENMaterials::Construct()
     
     G4int absorbEntries = 0;
     G4double varabsorblength;
-    G4double absorbEnergy[500];
-    G4double Absorb[500];
-    G4double scintEnergyZnS[500];
-    G4double scintEmitZnS[500];
-    G4double scintReflect[500];
+    G4double absorbEnergy[500] = { 0 };
+    G4double Absorb[500] = { 0 };
+    G4double scintEnergyZnS[500]= { 0 };
+    G4double scintEmitZnS[500] = { 0 };
+    G4double scintReflect[500] = { 0 };
     
     // G4double wlsabsorblength;
     for (int i = 0; i < 500; i++){
@@ -524,7 +535,11 @@ void PENMaterials::Construct()
     if(ReadScint.is_open()){
         while(!ReadScint.eof()){
             G4String filler;
+
             ReadScint>>pWavelength>>filler>>scintEmitZnS[scintEntries];
+            if (ReadScint.eof()) {
+                break;
+            }
             scintEnergyZnS[scintEntries] = (1240/pWavelength)*eV;         //convert wavelength to eV
             // scintSlow[scintEntries] = 0.0;  //arbitrary test value
             scintEntries++;
@@ -544,7 +559,11 @@ void PENMaterials::Construct()
     if (Readabsorb.is_open()){
         while(!Readabsorb.eof()){
             G4String filler;
+
             Readabsorb >> pWavelength >> filler >> varabsorblength;
+            if (Readabsorb.eof()) {
+                break;
+            }
             absorbEnergy[absorbEntries] = (1240/pWavelength)*eV;
             Absorb[absorbEntries] = varabsorblength * m;
             absorbEntries++;
@@ -570,11 +589,15 @@ void PENMaterials::Construct()
     if(Read_ref_index2.is_open()){
      while(!Read_ref_index2.eof()){
        G4String filler;
-       Read_ref_index2 >> pWavelength  >> filler >> ref_index_value[ref_index_Entries];
-	 ref_index_Energy[ref_index_Entries] = (1240/pWavelength)*eV;
-	 scintReflect[ref_index_Entries] = 1.0;
 
-	 ref_index_Entries++;
+       Read_ref_index2 >> pWavelength  >> filler >> ref_index_value[ref_index_Entries];
+       if (Read_ref_index2.eof()) {
+           break;
+       }
+	   ref_index_Energy[ref_index_Entries] = (1240/pWavelength)*eV;
+	   scintReflect[ref_index_Entries] = 1.0;
+
+	   ref_index_Entries++;
 	   }
     }
         else
@@ -643,8 +666,8 @@ void PENMaterials::Construct()
     pvt_structure->GetIonisation()->SetMeanExcitationEnergy(64.7*eV); // NIST G4_PLASTIC_SC_VINYLTOLUENE
 
 
-    G4double scintEnergyPVT[115];
-    G4double scintEmitPVT[115];
+    G4double scintEnergyPVT[115] = { 0 };
+    G4double scintEmitPVT[115] = { 0 };
     G4int scintEntries_pvt = 115;
     // Read primary emission spectrum
     Scint_file ="../properties/PVTEmission.dat";
@@ -656,9 +679,15 @@ void PENMaterials::Construct()
 	 
             G4String filler;
             ReadPVTScint>>pWavelength>>filler>>scintEmitPVT[scintEntries];
+            if (ReadPVTScint.eof()) {
+                break;
+            }
+            if (scintEntries > (scintEntries_pvt - 1)) {
+                G4cout << " ERROR < scint entries out of range > " << G4endl;
+                break;
+            }
             scintEnergyPVT[scintEntries] = (1240./pWavelength)*eV;         //convert wavelength to eV
             scintEntries++;
-	    if (scintEntries > (scintEntries_pvt-1)){ G4cout << " ERROR < scint entries out of range > " << G4endl; break;}
         }
     }
     else
@@ -667,9 +696,9 @@ void PENMaterials::Construct()
      
     // Read primary bulk absorption
     G4int abs_entries_pvt = 500;
-    G4double absorbEnergy_pvt[500];
-    G4double Absorb_pvt[500];
-    G4double Rayleigh_pvt[500];
+    G4double absorbEnergy_pvt[500] = { 0 };
+    G4double Absorb_pvt[500] = { 0 };
+    G4double Rayleigh_pvt[500] = { 0 };
     Readabsorblength = "../properties/PVTAbsorption.dat";
     
     Readabsorb.open(Readabsorblength);
@@ -678,12 +707,20 @@ void PENMaterials::Construct()
         while(!Readabsorb.eof()){
             G4String filler;
             Readabsorb >> pWavelength >> filler >> varabsorblength;
+            if (Readabsorb.eof()) {
+                break;
+            }
+            if (absorbEntries > (abs_entries_pvt - 1)) {
+                G4cout << " ERROR < entries abs out of range > " << G4endl;
+                break;
+            }
             absorbEnergy_pvt[absorbEntries] = (1240./pWavelength)*eV;
             Absorb_pvt[absorbEntries] = varabsorblength * m;
             Rayleigh_pvt[absorbEntries] = varabsorblength/5. * m;
+            
             absorbEntries++;
-	    if(absorbEntries > (abs_entries_pvt-1)){G4cout << " ERROR < entries abs out of range > " << G4endl; break;}
         }
+        
     }
     else
         G4cout<<"Error opening file: "<<Readabsorblength<<G4endl;
@@ -702,11 +739,18 @@ void PENMaterials::Construct()
         while(!Read_ref_index_pvt.eof()){
             G4String filler;
             Read_ref_index_pvt >> pWavelength >> filler >> ref_index_value_pvt[ref_index_Entries];
+            if (Read_ref_index_pvt.eof()) {
+                break;
+            }
+            if (ref_index_Entries > (entries_pvt_rindex - 1)) { 
+                G4cout << " ERROR < entries ref abs out of range > " << G4endl; 
+                break; 
+            }
+        }
             ref_index_Energy_pvt[ref_index_Entries] = (1240./pWavelength)*eV;
 	    //G4cout<<ref_index_Entries<<" rindex "<<ref_index_value_pvt[ref_index_Entries]<<" energy "<<ref_index_Energy_pvt[ref_index_Entries]<<G4endl;
             ref_index_Entries++;
-	    if(ref_index_Entries > (entries_pvt_rindex-1)){G4cout << " ERROR < entries ref abs  out of range > " << G4endl;break;}
-        }
+	    
     }
     else
         G4cout << "Error opening file: "<< ref_index_emit << G4endl;
@@ -765,7 +809,11 @@ void PENMaterials::Construct()
             G4String filler;
             G4double wavelength;
             G4double teflon_ref_coeff;
+
             Read_teflon >> wavelength >> filler >> teflon_ref_coeff;
+            if (Read_teflon.eof()) {
+                break;
+            }
             teflon_energy[teflon_entries] = (1240/wavelength)*eV;
             teflon_reflect[teflon_entries] = teflon_ref_coeff;
             zero[teflon_entries] = 1e-6;
@@ -824,6 +872,9 @@ void PENMaterials::Construct()
         while(!ReadWLSfiberabsorb.eof()){
             G4String filler;
             ReadWLSfiberabsorb >> pWavelength >> filler >> wls_fiber_absorblength;
+            if (ReadWLSfiberabsorb.eof()) {
+                break;
+            }
             wls_fiber_Energy[wls_fiber_Entries] = (1240/pWavelength)*eV;
             wls_fiber_Absorb[wls_fiber_Entries] = 1.0*wls_fiber_absorblength*m;
             
@@ -840,8 +891,8 @@ void PENMaterials::Construct()
     ReadWLSfiberabsorb.close();
     
     //Fiber WLS Emission  ****************************************
-    G4double wls_fiber_emit_Energy[500];
-    G4double wls_fiber_Emit[500];
+    G4double wls_fiber_emit_Energy[500] = { 0 };
+    G4double wls_fiber_Emit[500] = { 0 };
     G4int wls_fiber_emit_Entries = 0;
     
     std::ifstream ReadWLSfibemit;
@@ -852,8 +903,11 @@ void PENMaterials::Construct()
     if(ReadWLSfibemit.is_open()){
         while(!ReadWLSfibemit.eof()){
             G4String filler;
-            ;
+
             ReadWLSfibemit >> pWavelength >> filler >> wls_fiber_Emit[wls_fiber_emit_Entries];
+            if (ReadWLSfibemit.eof()) {
+                break;
+            }
             wls_fiber_emit_Energy[wls_fiber_emit_Entries] = (1240/pWavelength)*eV;
             wls_fiber_emit_Entries++;
         }
@@ -866,8 +920,8 @@ void PENMaterials::Construct()
     //Fiber Bulk Absorption ****************************************
     G4int bulk_fiber_Entries = 0;
     G4double bulk_fiber_absorblength;
-    G4double bulk_fiber_Absorb[500];
-    G4double bulk_fiber_Energy[500];
+    G4double bulk_fiber_Absorb[500] = { 0 };
+    G4double bulk_fiber_Energy[500] = { 0 };
     std::ifstream ReadFiberBulk;
     
     //  G4String FiberBulk = "../properties/fiberPSTabsorb.dat";
@@ -877,8 +931,11 @@ void PENMaterials::Construct()
     if(ReadFiberBulk.is_open()){
         while(!ReadFiberBulk.eof()){
             G4String filler;
-            ;
+
             ReadFiberBulk >> pWavelength >> filler >> bulk_fiber_absorblength;
+            if (ReadFiberBulk.eof()) {
+                break;
+            }
             bulk_fiber_Energy[bulk_fiber_Entries] = (1240/pWavelength)*eV;
             bulk_fiber_Absorb[bulk_fiber_Entries] = 1.0*bulk_fiber_absorblength*m;
             bulk_fiber_Entries++;
@@ -890,8 +947,8 @@ void PENMaterials::Construct()
     
     
     //PMMA Fiber Bulk Absorption  ******************************************
-    G4double pmma_fiber_bulkAbsorb[500];
-    G4double pmma_fiber_Energy[500];
+    G4double pmma_fiber_bulkAbsorb[500] = { 0 };
+    G4double pmma_fiber_Energy[500] = { 0 };
     G4double pmma_fiber_absorblength;
     G4int pmma_fiber_Entries = 0;
     
@@ -903,8 +960,11 @@ void PENMaterials::Construct()
     if(Read_pmma_fib_Bulk.is_open()){
         while(!Read_pmma_fib_Bulk.eof()){
             G4String filler;
-            ;
+
             Read_pmma_fib_Bulk >> pWavelength >> filler >> pmma_fiber_absorblength;
+            if (Read_pmma_fib_Bulk.eof()) {
+                break;
+            }
             pmma_fiber_Energy[pmma_fiber_Entries] = (1240/pWavelength)*eV;
             pmma_fiber_bulkAbsorb[pmma_fiber_Entries] = 1.0*pmma_fiber_absorblength*m;
             pmma_fiber_Entries++;
@@ -982,7 +1042,11 @@ void PENMaterials::Construct()
     if(ReadGreaseBulk.is_open()){
         while(!ReadGreaseBulk.eof()){
             G4String filler;
+
             ReadGreaseBulk>>pWavelength>>filler>>Greaseabsorblength;
+            if (ReadGreaseBulk.eof()) {
+                break;
+            }
             GreaseEnergy[GreaseEntries]=(1240/pWavelength)*eV;
             GreasebulkAbsorb[GreaseEntries]=Greaseabsorblength*m;
             GreaseIndex[GreaseEntries]=GreaseIndexconst;
@@ -1115,9 +1179,9 @@ void PENMaterials::Construct()
     materialVikuiti->AddElement(C, number_of_atoms=10);
 
     G4int vikuiti_entries = 0;
-    G4double vikuiti_energy[202];
-    G4double vikuiti_reflect[202];
-    G4double zero_vikuiti[202];
+    G4double vikuiti_energy[202] = { 0 };
+    G4double vikuiti_reflect[202] = { 0 };
+    G4double zero_vikuiti[202] = { 0 };
 
     std::ifstream Read_vikuiti;
     G4String vikuiti_file = "../properties/vikuiti.dat";
@@ -1128,7 +1192,11 @@ void PENMaterials::Construct()
             G4String filler;
             G4double wavelength;
             G4double vikuiti_ref_coeff;
+
             Read_vikuiti >> wavelength >> filler >> vikuiti_ref_coeff;
+            if (Read_vikuiti.eof()) {
+                break;
+            }
             vikuiti_energy[vikuiti_entries] = (1240./wavelength)*eV;
             vikuiti_reflect[vikuiti_entries] = vikuiti_ref_coeff;
             zero_vikuiti[vikuiti_entries] = 1e-6;
@@ -1175,9 +1243,9 @@ void PENMaterials::Construct()
     //G4Material* matererialGlassPMT =  nistManager->FindOrBuildMaterial("G4_Pyrex_Glass");
     G4MaterialPropertiesTable *MPT_GlassPMT = new G4MaterialPropertiesTable();
     G4int glassPMTEntries = 400;
-    G4double glassPMTRindex[400];
-    G4double glassPMTEnergy[400];
-    G4double glassPMTAbs[400];
+    G4double glassPMTRindex[400] = { 0 };
+    G4double glassPMTEnergy[400] = { 0 };
+    G4double glassPMTAbs[400] = { 0 };
     std::ifstream Read_glassPMT;
     G4String glassPMT_file = "../properties/Rindex_real_glass_pmt.txt";
 
@@ -1186,7 +1254,11 @@ void PENMaterials::Construct()
     if(Read_glassPMT.is_open()){
         while(!Read_glassPMT.eof()){
                 G4double wavelength, glass_rindex;
+
                 Read_glassPMT >> wavelength >> glass_rindex;
+                if (Read_glassPMT.eof()) {
+                    break;
+                }
                 glassPMTEnergy[counter_glass] = (1240./wavelength)*eV;
                 glassPMTRindex[counter_glass] = glass_rindex;
                 glassPMTAbs[counter_glass] = 1*m;
