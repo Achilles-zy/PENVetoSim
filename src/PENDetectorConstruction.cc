@@ -69,9 +69,10 @@ PENDetectorConstruction::PENDetectorConstruction():
 	MPT_PEN = new G4MaterialPropertiesTable();
 	AbsorptionLength = 1.5;//value at 400 nm
 	fRES = 1.0;
-	fLY = 5500. / MeV;
+	fLY = 3000. / MeV;
 	fABSFile = "PEN_ABS";
 	pmtReflectivity = 0.50;
+	G4cout << "Start Construction" << G4endl;
 	DefineMat();
 	fTargetMaterial = G4Material::GetMaterial("PVT_structure");
 	fGlassMaterialPMT = G4Material::GetMaterial("BorosilicateGlass");
