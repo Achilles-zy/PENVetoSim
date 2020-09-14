@@ -93,6 +93,8 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
         G4Material* matLN2;
         G4Material* matLAr;
         G4Material* matGAGG;
+		G4Material* matPTFE;
+		G4Material* matCu;
 
         G4String fABSFile;
 
