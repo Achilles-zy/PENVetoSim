@@ -17,7 +17,7 @@ PENPrimaryGeneratorAction::PENPrimaryGeneratorAction()
 
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
     G4String particleName = "e-";
-	G4double particleEnergy = 1.86 * MeV;
+	G4double particleEnergy = 1 * MeV;
 	/*
 	G4PhysicalVolumeStore* PVStore = G4PhysicalVolumeStore::GetInstance();
 	G4int i = 0;
@@ -37,6 +37,7 @@ PENPrimaryGeneratorAction::PENPrimaryGeneratorAction()
 	PENGPS->GetCurrentSource()->GetPosDist()->SetCentreCoords(G4ThreeVector(0, 0, 0));
 	PENGPS->GetCurrentSource()->GetPosDist()->SetRadius(40 * mm);
 	PENGPS->GetCurrentSource()->GetPosDist()->SetHalfZ(61 * mm);
+
 	//PENGPS->GetCurrentSource()->GetPosDist()->ConfineSourceToVolume("PENShell");
 	//PENGPS->GetCurrentSource()->GetPosDist()->ConfineSourceToVolume("PENShell");
 

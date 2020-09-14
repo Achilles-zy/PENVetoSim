@@ -95,6 +95,7 @@ void PENDetectorConstruction::DefineMat()
 	fABS = G4Material::GetMaterial("ABS");
 	matPEN = G4Material::GetMaterial("PEN");
 	matSi = G4Material::GetMaterial("G4_Si");
+	matCu = G4Material::GetMaterial("G4_Cu");
 	matTriggerFoilEJ212 = G4Material::GetMaterial("EJ212");
 	Pstyrene = G4Material::GetMaterial("Polystyrene");
 	matPMMA = G4Material::GetMaterial("PMMA");
@@ -109,6 +110,7 @@ void PENDetectorConstruction::DefineMat()
 	matLN2 = G4Material::GetMaterial("G4_lN2");
 	matLAr = G4Material::GetMaterial("G4_lAr");
 	matGAGG = G4Material::GetMaterial("GAGG");
+	matPTFE = G4Material::GetMaterial("PTFE");
 
 	G4cout << " materials ok " << G4endl;
 
@@ -480,8 +482,8 @@ G4VPhysicalVolume* PENDetectorConstruction::Construct()
   //     
   // World&Envelope
   //
-  G4double world_size = 60 * cm;
-  G4double env_size = 50 * cm;
+  G4double world_size = 200 * cm;
+  G4double env_size = 180 * cm;
   G4Box* solidWorld = new G4Box("World", 0.5 * world_size, 0.5 * world_size, 0.5 * world_size);
   G4LogicalVolume* logicWorld = new G4LogicalVolume(solidWorld, world_mat, "World");
   G4VPhysicalVolume* physWorld =
@@ -584,17 +586,29 @@ G4VPhysicalVolume* PENDetectorConstruction::Construct()
 
   //PEN shell scintilator
   G4double LN2Gap = 0.5 * mm;
-  G4double ShellThickness = 1 * cm;
+  G4double ShellThickness = 2 * cm;
   auto solidPENShell = new G4Tubs("solidPENShell", outerGeRadius + LN2Gap, outerGeRadius + LN2Gap + ShellThickness, GeHeight1, 0., twopi);
   auto logicPENShell = new G4LogicalVolume(solidPENShell, matPEN, "logicPENShell");
   auto physPENShell = new G4PVPlacement(0, G4ThreeVector(), logicPENShell, "PENShell", logicEnv, false, 0, checkOverlaps);
+
+  //Wire with PTFE
+  G4double WireLength = 20 * cm;
+  G4double SkinThickness = 0.5 * mm;
+  G4double CoreRadius = 0.2 * mm;
+  auto solidWire = new G4Tubs("solidWire", CoreRadius, CoreRadius + SkinThickness, WireLength, 0., twopi);
+  auto logicWire = new G4LogicalVolume(solidWire, matPTFE, "logicWire");
+  auto physWire = new G4PVPlacement(0, G4ThreeVector(outerGeRadius + LN2Gap + ShellThickness + CoreRadius + SkinThickness, 0, 0), logicWire, "Wire", logicEnv, false, 0, checkOverlaps);
+  //auto physWire = new G4PVPlacement(0, G4ThreeVector(10 * cm, 0, 0), logicWire, "Wire", logicEnv, false, 0, checkOverlaps);
+  auto solidCore = new G4Tubs("solidCore", 0, CoreRadius, WireLength, 0., twopi);
+  auto logicCore = new G4LogicalVolume(solidCore, matCu, "logicCore");
+  auto physCore = new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logicCore, "Core", logicWire, false, 0, checkOverlaps);
 
   //SiPMs
   G4double SiPM_L = 10 * mm, SiPM_D = 0.5 * mm;
   G4Box* solidSiPM = new G4Box("SiPM_box", SiPM_D / 2, SiPM_L / 2, SiPM_L / 2);
   G4LogicalVolume* logicSiPM = new G4LogicalVolume(solidSiPM, matSi, "SiPM_log");
   G4double LN2Gap2 = 0.5 * mm;
-  G4double SiPMtoCenDist = outerGeRadius + LN2Gap + ShellThickness + LN2Gap2 + SiPM_D / 2 + 5 * cm;
+  G4double SiPMtoCenDist = outerGeRadius + LN2Gap + ShellThickness + LN2Gap2 + SiPM_D / 2 + 30 * cm;
 
   G4double xyAngle0 = 0 * degree;
   auto rotSiPM0 = new G4RotationMatrix();
@@ -639,6 +653,7 @@ G4VPhysicalVolume* PENDetectorConstruction::Construct()
   G4OpticalSurface* SiPM_LN2_4 = new G4OpticalSurface("SiPM_LN2_4");
   G4OpticalSurface* SiPM_LN2_5 = new G4OpticalSurface("SiPM_LN2_5");
  // G4OpticalSurface* SiPM_LN2_P = new G4OpticalSurface("SiPM_LN2_P");
+
 
   G4LogicalBorderSurface* PEN_LN2_LBS = new G4LogicalBorderSurface("PEN_LN2_LBS", physEnv, physPENShell, PEN_LN2);
   G4LogicalBorderSurface* Ge_LN2_LBS = new G4LogicalBorderSurface("PEN_LN2_LBS", physEnv, physDet, PEN_LN2);
@@ -689,6 +704,14 @@ G4VPhysicalVolume* PENDetectorConstruction::Construct()
   SiPM_LN2_4->SetFinish(Detector_LUT);
   SiPM_LN2_5->SetFinish(Detector_LUT);
   //SiPM_LN2_P->SetFinish(Detector_LUT);
+
+  G4OpticalSurface* Wire_LN2 = new G4OpticalSurface("Wire_LN2");
+  G4LogicalBorderSurface* Wire_LN2_LBS = new G4LogicalBorderSurface("Wire_LN2_LBS", physEnv, physWire, Wire_LN2);
+  Wire_LN2 = dynamic_cast <G4OpticalSurface*>(Wire_LN2_LBS->GetSurface(physEnv, physWire)->GetSurfaceProperty());
+  Wire_LN2->SetType(dielectric_dielectric);
+  Wire_LN2->SetModel(DAVIS);
+  Wire_LN2->SetFinish(Polished_LUT);
+
   const G4int NUMENTRIES_CHIP = 11;
   const double hc = 6.62606876 * 2.99792458 * 100. / 1.602176462;
   G4double sipm_pp[NUMENTRIES_CHIP] = { hc / 600. * eV, hc / 590. * eV, hc / 580. * eV, hc / 570. * eV, hc / 560. * eV, hc / 550. * eV, hc / 540. * eV, hc / 530. * eV, hc / 520. * eV,hc / 510. * eV,hc / 500. * eV };
