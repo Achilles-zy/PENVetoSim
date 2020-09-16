@@ -50,9 +50,20 @@ void PENSteppingAction::UserSteppingAction(const G4Step* aStep)
 	}
 
 	G4int processtype = aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessSubType();
+	G4int creatorprocess = aStep->GetTrack()->GetCreatorProcess()->GetProcessSubType();
 	G4int parentID = aStep->GetTrack()->GetParentID();
-	if (parentID == 1 && processtype == fRadioactiveDecay) {
+	if (parentID == 2 && processtype == fRadioactiveDecay) {
+		//G4cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBb" << G4endl;
 		aStep->GetTrack()->SetTrackStatus(fKillTrackAndSecondaries);
+	}
+	if (processtype == fRadioactiveDecay) {
+		//G4cout << "Parent ID =" <<parentID << G4endl;
+
+	}
+
+	if (parentID == 1) {
+		
+		//G4cout << "Parent ID =" << parentID << "Particle =" << aStep->GetTrack()->GetParticleDefinition()->GetParticleName() << "Process =" << aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() <<aStep->GetTotalEnergyDeposit()<< G4endl;
 	}
 };
 

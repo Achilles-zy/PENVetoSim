@@ -4,6 +4,7 @@
 #include "PENEventAction.hh"
 #include "PENSteppingAction.hh"
 #include "PENTrackingAction.hh"
+#include "PENStackingAction.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -37,4 +38,5 @@ void PENActionInitialization::Build() const
 	SetUserAction(eventAction);
 
 	SetUserAction(new PENSteppingAction(eventAction));
+	//SetUserAction(new PENStackingAction);
 }

@@ -17,7 +17,7 @@ PENPrimaryGeneratorAction::PENPrimaryGeneratorAction()
 
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
     G4String particleName = "e-";
-	G4double particleEnergy = 1 * MeV;
+	G4double particleEnergy = 0 * MeV;
 	/*
 	G4PhysicalVolumeStore* PVStore = G4PhysicalVolumeStore::GetInstance();
 	G4int i = 0;
