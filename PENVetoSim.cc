@@ -72,7 +72,7 @@ int main(int argc, char** argv)
     UImanager->ApplyCommand("/process/em/fluo true");
     UImanager->ApplyCommand("/process/em/auger true");
     UImanager->ApplyCommand("/process/em/augerCascade true");
-    //UImanager->ApplyCommand("/process/em/pixe true");
+    UImanager->ApplyCommand("/process/em/pixe true");
 
     //#ifdef G4VIS_USE
     G4VisManager* PENVis = new G4VisExecutive;
