@@ -50,9 +50,15 @@ void PENSteppingAction::UserSteppingAction(const G4Step* aStep)
 		}
 	}
 
+
+	if (PENEvent->GetPhotonCnt() > 3 && particle_name == "opticalphoton") {
+		aStep->GetTrack()->SetTrackStatus(fStopAndKill);
+	}
+
 	G4int processtype = aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessSubType();
 	G4int creatorprocess = aStep->GetTrack()->GetCreatorProcess()->GetProcessSubType();
 	G4int parentID = aStep->GetTrack()->GetParentID();
+
 	if (parentID == 1 ) {
 		if (processtype == fScintillation || processtype == fRadioactiveDecay) {
 			//G4cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBb" << G4endl;

@@ -13,7 +13,7 @@ class PENEventAction;
 class PENTrackingAction : public G4UserTrackingAction
 {
   public:
-    PENTrackingAction(PENDetectorConstruction*, PENEventAction*);
+    PENTrackingAction(PENEventAction*);
    ~PENTrackingAction();
 
   public:
@@ -21,7 +21,7 @@ class PENTrackingAction : public G4UserTrackingAction
     void PostUserTrackingAction(const G4Track*);
 
   private:
-    PENDetectorConstruction* PENDetCons;
+
     PENEventAction*      PENEvent;
 };
 

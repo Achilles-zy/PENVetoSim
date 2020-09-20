@@ -14,9 +14,8 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
  
-PENTrackingAction::PENTrackingAction(PENDetectorConstruction* det,
-				     PENEventAction* evt):
-    PENDetCons(det),PENEvent(evt)
+PENTrackingAction::PENTrackingAction(PENEventAction* evt)
+    :PENEvent(evt)
 {}
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
  
@@ -30,7 +29,11 @@ void PENTrackingAction::PreUserTrackingAction(const G4Track* track)
     G4double charge = track->GetDefinition()->GetPDGCharge();
     G4int ID = track->GetTrackID();
     G4int parentID = track->GetParentID();
+    //G4cout << "photoncnt = " << PENEvent->GetPhotonCnt() << G4endl;
     G4double trackTime = track->GetGlobalTime();
+    if (PENEvent->GetPhotonCnt() > 3) {
+        //track->GetStep()->GetTrack()->SetTrackStatus(fStopAndKill);
+    }
 
 }
 

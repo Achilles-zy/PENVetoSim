@@ -27,6 +27,7 @@ class PENEventAction : public G4UserEventAction
 	void SiPMTrue() { ifSiPM == true; }
 	void BulkTrue() { ifBulk == true; }
 	void CountSiPMPhoton(G4int ph) { PhotonCount = PhotonCount + ph; }
+    G4int GetPhotonCnt() { return PhotonCount; }
 
   private:
     G4double edepBulk;
