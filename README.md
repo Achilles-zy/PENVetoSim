@@ -1,4 +1,4 @@
-# Step1
+# PENVetoSim
 
 Veto simulation of nucleus inside PEN material
 
@@ -9,3 +9,7 @@ Stable Version
 Using SiPM photon count as cut, current cut is 3 photon
 
 Remove this cut if you want complete photon signal information
+
+Nuclear recoil energy is ignored
+
+Full chain is off
