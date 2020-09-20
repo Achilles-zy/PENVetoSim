@@ -87,7 +87,7 @@ void PENRunAction::EndOfRunAction(const G4Run* aRun)
 	  }
 	  output
 		  << "Run ID:\t" << std::setw(5) << aRun->GetRunID() << '\t'
-		  << "VetoEventCount =\t" << std::left << std::setw(5) << VetoEventCount.GetValue() << '\t'
+		  << "VetoEventCount =\t" << std::left << std::setw(10) << VetoEventCount.GetValue() << '\t'
 		  << "SiPMEventCount =\t" << std::left << std::setw(10) << SiPMEventCount.GetValue() << '\t'
 		  << "BulkEventCount =\t" << std::left << std::setw(10) << BulkEventCount.GetValue() << G4endl;
 	  output.close();
