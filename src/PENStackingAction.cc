@@ -14,7 +14,7 @@
 
 PENStackingAction::PENStackingAction()
     :G4UserStackingAction(),
-    fFullChain(true),
+    fFullChain(false),
     fCurrentParent(0)
 {
     // for HPGe detector, 10us time window

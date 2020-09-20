@@ -13,6 +13,7 @@
 #include "globals.hh"
 #include "G4RunManager.hh"
 #include "G4HadronicProcessType.hh"
+#include "G4EmProcessSubType.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -52,9 +53,11 @@ void PENSteppingAction::UserSteppingAction(const G4Step* aStep)
 	G4int processtype = aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessSubType();
 	G4int creatorprocess = aStep->GetTrack()->GetCreatorProcess()->GetProcessSubType();
 	G4int parentID = aStep->GetTrack()->GetParentID();
-	if (parentID == 2 && processtype == fRadioactiveDecay) {
-		//G4cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBb" << G4endl;
-		aStep->GetTrack()->SetTrackStatus(fKillTrackAndSecondaries);
+	if (parentID == 1 ) {
+		if (processtype == fScintillation || processtype == fRadioactiveDecay) {
+			//G4cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBb" << G4endl;
+			//aStep->GetTrack()->SetTrackStatus(fKillTrackAndSecondaries);
+		}
 	}
 	if (processtype == fRadioactiveDecay) {
 		//G4cout << "Parent ID =" <<parentID << G4endl;
