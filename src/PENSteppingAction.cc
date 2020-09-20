@@ -25,34 +25,29 @@ PENSteppingAction::PENSteppingAction(
 
 void PENSteppingAction::UserSteppingAction(const G4Step* aStep)
 {
+	auto volume = aStep->GetPostStepPoint()->GetTouchableHandle()->GetVolume();
+	auto particle_name = aStep->GetTrack()->GetParticleDefinition()->GetParticleName();
+
+	auto edep = aStep->GetTotalEnergyDeposit();
+	if (PENEvent->GetPhotonCnt() > 3 && particle_name == "opticalphoton") {
+		aStep->GetTrack()->SetTrackStatus(fStopAndKill);
+	}
+
 	const PENDetectorConstruction* detectorConstruction
 		= static_cast<const PENDetectorConstruction*>
 		(G4RunManager::GetRunManager()->GetUserDetectorConstruction());
-	auto volume = aStep->GetPostStepPoint()->GetTouchableHandle()->GetVolume();
-	auto particle_name = aStep->GetTrack()->GetParticleDefinition()->GetParticleName();
-	//G4cout<<particle_name<<G4endl;
-	//G4cout<<volume<<G4endl;
 
-	auto edep = aStep->GetTotalEnergyDeposit();
-	//G4cout<<edep<<G4endl;
-	//G4cout<<PENDetCons->GetCrystal(i)<<G4endl;
 	if (volume == detectorConstruction->GetBulk()) {
 		//PENEvent->BulkTrue();
 		PENEvent->AddBulkEnergy(edep);
 	}
 
-	for (int i = 0; i <= 6; i++) {
+	for (int i = 0; i <= 5; i++) {
 		if (volume == detectorConstruction->GetSiPM(i)&& particle_name == "opticalphoton") {
-			
 			aStep->GetTrack()->SetTrackStatus(fStopAndKill);
 			PENEvent->AddToSiPM(i);
 			PENEvent->CountSiPMPhoton(1);
 		}
-	}
-
-
-	if (PENEvent->GetPhotonCnt() > 3 && particle_name == "opticalphoton") {
-		aStep->GetTrack()->SetTrackStatus(fStopAndKill);
 	}
 
 	G4int processtype = aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessSubType();
@@ -74,7 +69,7 @@ void PENSteppingAction::UserSteppingAction(const G4Step* aStep)
 		
 		//G4cout << "Parent ID =" << parentID << "Particle =" << aStep->GetTrack()->GetParticleDefinition()->GetParticleName() << "Process =" << aStep->GetPostStepPoint()->GetProcessDefinedStep()->GetProcessName() <<aStep->GetTotalEnergyDeposit()<< G4endl;
 	}
-};
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
