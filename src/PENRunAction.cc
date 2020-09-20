@@ -62,11 +62,7 @@ void PENRunAction::EndOfRunAction(const G4Run* aRun)
 {
   G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
   accumulableManager->Merge();
-	
-  G4cout<<"End Running ..."<<G4endl;
-  G4cout << "VetoEventCount =" << VetoEventCount.GetValue() << G4endl;
-  G4cout << "SiPMEventCount =" << SiPMEventCount.GetValue() << G4endl;
-  G4cout << "BulkEventCount =" << BulkEventCount.GetValue() << G4endl;
+
   auto analysisManager = G4AnalysisManager::Instance();
   analysisManager->FillNtupleIColumn(0, VetoEventCount.GetValue());
   analysisManager->FillNtupleIColumn(1, SiPMEventCount.GetValue());
@@ -74,23 +70,29 @@ void PENRunAction::EndOfRunAction(const G4Run* aRun)
   analysisManager->AddNtupleRow();
   // analysisManager -> SetH1Plotting(0,true);
   // analysisManager -> SetH1Plotting(1,true);
-  // analysisManager -> SetH1Plotting(2,true);
-  // analysisManager -> SetH1Plotting(3,true);
-  // analysisManager -> SetH1Plotting(4,true);
-  // analysisManager -> SetH1Plotting(5,true);
-  // analysisManager -> SetH1Plotting(6,true);
-  // analysisManager -> SetH1Plotting(7,true);
-  // analysisManager -> SetH1Plotting(8,true);
-  // analysisManager -> SetH1Plotting(9,true);
-  // analysisManager -> SetH1Plotting(10,true);
-  // analysisManager -> SetH1Plotting(11,true);
-  // analysisManager -> SetH1Plotting(12,true);
-  // analysisManager -> SetH1Plotting(13,true);
-  // analysisManager -> SetH1Plotting(14,true);
-  // analysisManager -> SetH1Plotting(15,true);
-  // analysisManager -> SetH1Plotting(16,true);
-  // analysisManager -> SetH1Plotting(17,true);
 
+  if (G4RunManager::GetRunManager()->GetRunManagerType() == 1) {
+	  G4cout << "End Running ..." << G4endl;
+	  G4cout << "VetoEventCount =" << VetoEventCount.GetValue() << G4endl;
+	  G4cout << "SiPMEventCount =" << SiPMEventCount.GetValue() << G4endl;
+	  G4cout << "BulkEventCount =" << BulkEventCount.GetValue() << G4endl;
+
+	  std::ofstream output;
+	  if (aRun->GetRunID() == 0) {
+		  output.open("Simulation Result.txt", std::ios::ate);
+	  }
+	  else
+	  {
+		  output.open("Simulation Result.txt", std::ios::app);
+	  }
+	  output
+		  << "Run ID:\t" << std::setw(5) << aRun->GetRunID() << '\t'
+		  << "VetoEventCount =\t" << std::left << std::setw(5) << VetoEventCount.GetValue() << '\t'
+		  << "SiPMEventCount =\t" << std::left << std::setw(10) << SiPMEventCount.GetValue() << '\t'
+		  << "BulkEventCount =\t" << std::left << std::setw(10) << BulkEventCount.GetValue() << G4endl;
+	  output.close();
+	  //std::DecimalFormat df1 = new DecimalFormat("0.0");
+  }
 
   analysisManager->Write();
   analysisManager->CloseFile();
