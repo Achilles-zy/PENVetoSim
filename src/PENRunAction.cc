@@ -5,7 +5,7 @@
 #include "G4Run.hh"
 #include "G4RunManager.hh"
 #include "G4SystemOfUnits.hh"
-
+#include <time.h>
 #include "g4root.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -53,7 +53,10 @@ void PENRunAction::BeginOfRunAction(const G4Run* aRun)
 
   G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
   accumulableManager->Reset();
-  G4cout<<"cccccccccccccccccccccccccccccccccccccccccccccccccccBegin Running ..." << G4endl;
+  if (G4RunManager::GetRunManager()->GetRunManagerType() == 1) {
+	  G4cout << "Begin Running ..." << G4endl;
+  }
+  
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -73,9 +76,15 @@ void PENRunAction::EndOfRunAction(const G4Run* aRun)
 
   if (G4RunManager::GetRunManager()->GetRunManagerType() == 1) {
 	  G4cout << "End Running ..." << G4endl;
+	  G4cout << "==========================Run Summary==========================" << G4endl;
+	  G4cout << G4endl;
+	  G4cout << G4endl;
 	  G4cout << "VetoEventCount =" << VetoEventCount.GetValue() << G4endl;
 	  G4cout << "SiPMEventCount =" << SiPMEventCount.GetValue() << G4endl;
 	  G4cout << "BulkEventCount =" << BulkEventCount.GetValue() << G4endl;
+	  G4cout << G4endl;
+	  G4cout << G4endl;
+	  G4cout << "===============================================================" << G4endl;
 
 	  std::ofstream output;
 	  if (aRun->GetRunID() == 0) {
