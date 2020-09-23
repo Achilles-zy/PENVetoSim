@@ -35,7 +35,7 @@ PENPrimaryGeneratorAction::PENPrimaryGeneratorAction()
 	PENGPS->GetCurrentSource()->GetPosDist()->SetPosDisType("Volume");
 	PENGPS->GetCurrentSource()->GetPosDist()->SetPosDisShape("Cylinder");
 	PENGPS->GetCurrentSource()->GetPosDist()->SetCentreCoords(G4ThreeVector(0, 0, 0));
-	PENGPS->GetCurrentSource()->GetPosDist()->SetRadius(40 * mm);
+	PENGPS->GetCurrentSource()->GetPosDist()->SetRadius(60 * mm);
 	PENGPS->GetCurrentSource()->GetPosDist()->SetHalfZ(61 * mm);
 
 	//PENGPS->GetCurrentSource()->GetPosDist()->ConfineSourceToVolume("PENShell");
