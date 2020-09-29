@@ -743,6 +743,7 @@ G4VPhysicalVolume* PENDetectorConstruction::Construct()
 
   Bulk = physBulk;
   PENShell = physPENShell;
+  Env = physEnv;
   SiPM_0 = physSiPM0;
   SiPM_1 = physSiPM1;
   SiPM_2 = physSiPM2;

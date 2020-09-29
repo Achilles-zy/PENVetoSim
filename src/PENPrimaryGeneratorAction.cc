@@ -51,4 +51,9 @@ PENPrimaryGeneratorAction::~PENPrimaryGeneratorAction()
 void PENPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
     PENGPS->GeneratePrimaryVertex(anEvent);
+	anEvent->GetEventID();
+	if (anEvent->GetEventID() == 0) {
+		PrimaryE = PENGPS->GetCurrentSource()->GetParticleEnergy();
+		PrimaryName = PENGPS->GetCurrentSource()->GetParticleDefinition()->GetParticleName();
+	}
 }

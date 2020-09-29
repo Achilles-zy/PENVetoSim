@@ -4,7 +4,7 @@
 #include "G4VUserActionInitialization.hh"
 
 /// Action initialization class.
-
+class PENPrimaryGeneratorAction;
 class PENActionInitialization : public G4VUserActionInitialization
 {
 public:
@@ -13,6 +13,9 @@ public:
 
 	virtual void BuildForMaster() const;
 	virtual void Build() const;
+
+private:
+	PENPrimaryGeneratorAction* fPrimaryGenerator;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

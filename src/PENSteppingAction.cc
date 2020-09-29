@@ -37,9 +37,13 @@ void PENSteppingAction::UserSteppingAction(const G4Step* aStep)
 		= static_cast<const PENDetectorConstruction*>
 		(G4RunManager::GetRunManager()->GetUserDetectorConstruction());
 
-	if (volume == detectorConstruction->GetBulk()) {
+	if (volume == detectorConstruction->GetBulk() && particle_name != "opticalphoton") {
 		//PENEvent->BulkTrue();
 		PENEvent->AddBulkEnergy(edep);
+	}
+
+	if (volume == detectorConstruction->GetEnv() && particle_name == "opticalphoton") {
+		PENEvent->DetectableTrue();
 	}
 
 	for (int i = 0; i <= 5; i++) {

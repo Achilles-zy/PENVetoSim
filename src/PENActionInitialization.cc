@@ -10,7 +10,9 @@
 
 PENActionInitialization::PENActionInitialization()
 	: G4VUserActionInitialization()
-{}
+{
+	fPrimaryGenerator = new PENPrimaryGeneratorAction();
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -21,7 +23,7 @@ PENActionInitialization::~PENActionInitialization()
 
 void PENActionInitialization::BuildForMaster() const
 {
-	PENRunAction* runAction = new PENRunAction;
+	PENRunAction* runAction = new PENRunAction(fPrimaryGenerator);
 	SetUserAction(runAction);
 }
 
@@ -29,9 +31,9 @@ void PENActionInitialization::BuildForMaster() const
 
 void PENActionInitialization::Build() const
 {
-	SetUserAction(new PENPrimaryGeneratorAction);
+	SetUserAction(fPrimaryGenerator);
 
-	PENRunAction* runAction = new PENRunAction;
+	PENRunAction* runAction = new PENRunAction(fPrimaryGenerator);
 	SetUserAction(runAction);
 
 	PENEventAction* eventAction = new PENEventAction(runAction);

@@ -26,6 +26,7 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
         ~PENDetectorConstruction();
         const G4VPhysicalVolume* GetPENShell() const;
 		const G4VPhysicalVolume* GetBulk() const;
+        const G4VPhysicalVolume* GetEnv() const;
         const G4VPhysicalVolume* GetSiPM(G4int i) const;
 
         G4VPhysicalVolume* Construct();
@@ -35,6 +36,7 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
     private:
         G4VPhysicalVolume* PENShell;
 		G4VPhysicalVolume* Bulk;
+        G4VPhysicalVolume* Env;
 		G4VPhysicalVolume* SiPM_0;
 		G4VPhysicalVolume* SiPM_1;
 		G4VPhysicalVolume* SiPM_2;
@@ -111,6 +113,12 @@ inline const G4VPhysicalVolume* PENDetectorConstruction::GetBulk() const
 {
 	return Bulk;
 }
+
+inline const G4VPhysicalVolume* PENDetectorConstruction::GetEnv() const
+{
+    return Env;
+}
+
 
 inline const G4VPhysicalVolume* PENDetectorConstruction::GetSiPM(G4int i) const
 {

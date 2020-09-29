@@ -24,10 +24,11 @@ class PENEventAction : public G4UserEventAction
     void EndOfEventAction(const G4Event*);
     void AddBulkEnergy(G4double);
     void AddToSiPM(G4int);
-	void SiPMTrue() { ifSiPM == true; }
-	void BulkTrue() { ifBulk == true; }
+	void SiPMTrue() { ifSiPM = true; }
+	void BulkTrue() { ifBulk = true; }
+    void DetectableTrue() { ifDetectable = true; }
 	void CountSiPMPhoton(G4int ph) { PhotonCount = PhotonCount + ph; }
-    G4int GetPhotonCnt() { return PhotonCount; }
+    inline G4int GetPhotonCnt() { return PhotonCount; }
 
   private:
     G4double edepBulk;
@@ -54,6 +55,7 @@ class PENEventAction : public G4UserEventAction
     
 	G4bool ifSiPM;
 	G4bool ifBulk;
+    G4bool ifDetectable;
 
 	PENRunAction* run;
     //TFile ResultFile;
