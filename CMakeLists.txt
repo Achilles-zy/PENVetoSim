@@ -69,6 +69,7 @@ set(PENVetoSim_SCRIPTS
   #scan.c
   vis.mac
   batch1.mac
+  batch-Radioactive.mac
   src1.mac
   )
 
