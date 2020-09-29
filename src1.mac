@@ -1,6 +1,6 @@
 /gps/particle ion
 /gps/ion 90 232 0 0
 
-/gps/energy 1. MeV
+/gps/energy 0 MeV
 /gps/pos/confine PENShell
 /run/beamOn 1
