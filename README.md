@@ -33,3 +33,9 @@ Default confinement of src is Wire
 9/29
 
 Added Veto-possible Event Count and Detectable Count
+
+
+
+10/19
+
+Merged the function of self veto simulation and active veto simulation
