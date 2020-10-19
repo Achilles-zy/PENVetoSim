@@ -25,30 +25,30 @@ PENDetectorMessenger::PENDetectorMessenger(PENDetectorConstruction* Det)
 	fDetCons(Det),
 	fPENDir(0),
 	fDetDir(0),
-	commandSetWireType(0),
-	commandSetConfine(0),
-	commandSetLayerNb(0)
+	cmdSetWireType(0),
+	cmdSetConfine(0),
+	cmdSetLayerNb(0)
 {
 	fDetDir = new G4UIdirectory("/PEN/det/set");
 	fDetDir->SetGuidance("detector construction commands");
 
-	commandSetWireType = new G4UIcmdWithAString("/PEN/det/set/wiretype", this);
-	commandSetWireType->SetGuidance("Select wire type.");
-	commandSetWireType->SetParameterName("choice", false);
-	commandSetWireType->AvailableForStates(G4State_PreInit, G4State_Idle);
-	commandSetWireType->SetToBeBroadcasted(false);
+	cmdSetWireType = new G4UIcmdWithAString("/PEN/det/set/wiretype", this);
+	cmdSetWireType->SetGuidance("Select wire type.");
+	cmdSetWireType->SetParameterName("choice", false);
+	cmdSetWireType->AvailableForStates(G4State_PreInit, G4State_Idle);
+	cmdSetWireType->SetToBeBroadcasted(false);
 
-	commandSetConfine = new G4UIcmdWithAString("/PEN/det/set/confine", this);
-	commandSetConfine->SetGuidance("Set confine name in file name.");
-	commandSetConfine->SetParameterName("choice", false);
-	commandSetConfine->AvailableForStates(G4State_PreInit, G4State_Idle);
-	commandSetConfine->SetToBeBroadcasted(false);
+	cmdSetConfine = new G4UIcmdWithAString("/PEN/det/set/confine", this);
+	cmdSetConfine->SetGuidance("Set confine name in file name.");
+	cmdSetConfine->SetParameterName("choice", false);
+	cmdSetConfine->AvailableForStates(G4State_PreInit, G4State_Idle);
+	cmdSetConfine->SetToBeBroadcasted(false);
 
-	commandSetLayerNb = new G4UIcmdWithAnInteger("/PEN/det/set/layernumber", this);
-	commandSetLayerNb->SetGuidance("Set PEN shell layer number");
-	commandSetLayerNb->SetParameterName("LayerNumber", false);
-	commandSetLayerNb->AvailableForStates(G4State_PreInit, G4State_Idle);
-	commandSetLayerNb->SetToBeBroadcasted(false);
+	cmdSetLayerNb = new G4UIcmdWithAnInteger("/PEN/det/set/layernumber", this);
+	cmdSetLayerNb->SetGuidance("Set PEN shell layer number");
+	cmdSetLayerNb->SetParameterName("LayerNumber", false);
+	cmdSetLayerNb->AvailableForStates(G4State_PreInit, G4State_Idle);
+	cmdSetLayerNb->SetToBeBroadcasted(false);
 
 }
 
@@ -58,25 +58,25 @@ PENDetectorMessenger::~PENDetectorMessenger()
 {
 	delete fDetDir;
 	delete fPENDir;
-	delete commandSetWireType;
-	delete commandSetConfine;
-	delete commandSetLayerNb;
+	delete cmdSetWireType;
+	delete cmdSetConfine;
+	delete cmdSetLayerNb;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void PENDetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
 {
-	if (command == commandSetWireType) {
+	if (command == cmdSetWireType) {
 		fDetCons->SetWireType(newValue);
 	}
 
-	if (command == commandSetConfine) {
+	if (command == cmdSetConfine) {
 		fDetCons->SetConfine(newValue);
 	}
 
-	if (command == commandSetLayerNb) {
-		fDetCons->SetLayerNb(commandSetLayerNb->GetNewIntValue(newValue));
+	if (command == cmdSetLayerNb) {
+		fDetCons->SetLayerNb(cmdSetLayerNb->GetNewIntValue(newValue));
 	}
 
 }

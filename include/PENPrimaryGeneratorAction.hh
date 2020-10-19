@@ -3,10 +3,12 @@
 
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "PENDetectorConstruction.hh"
+#include "PENPrimaryGeneratorMessenger.hh"
 
 class G4GeneralParticleSource;
 class G4Event;
 class PENDetectorConstruction;
+class PENPrimaryGeneratorMessenger;
 
 class PENPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
@@ -18,16 +20,23 @@ public:
     G4double GetPrimaryE() {
         return PrimaryE;
     }
+
     G4String GetPrimaryName() {
         return PrimaryName;
     }
 
+    void SetSrcType(G4String type) {
+        SrcType = type;
+    }
+
 private:
-    G4GeneralParticleSource* PENGPS;
     G4double PrimaryE;
     G4String PrimaryName;
-    PENDetectorConstruction* fDetCons;
+    G4String SrcType;
 
+    G4GeneralParticleSource* fPENGPS;
+    PENDetectorConstruction* fDetCons;
+    PENPrimaryGeneratorMessenger* fPrimaryMessenger;
 };
 
 #endif

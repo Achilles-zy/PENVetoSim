@@ -5,6 +5,7 @@
 #include "globals.hh"
 
 class PENDetectorConstruction;
+
 class G4UIdirectory;
 class G4UIcmdWithAString;
 class G4UIcmdWithADoubleAndUnit;
@@ -31,9 +32,9 @@ private:
     G4UIdirectory* fPENDir;
     G4UIdirectory* fDetDir;
 
-    G4UIcmdWithAString* commandSetWireType;
-    G4UIcmdWithAString* commandSetConfine;
-    G4UIcmdWithAnInteger* commandSetLayerNb;
+    G4UIcmdWithAString* cmdSetWireType;
+    G4UIcmdWithAString* cmdSetConfine;
+    G4UIcmdWithAnInteger* cmdSetLayerNb;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

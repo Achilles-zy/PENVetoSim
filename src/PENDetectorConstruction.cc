@@ -92,6 +92,8 @@ PENDetectorConstruction::PENDetectorConstruction():
 	fWireLength = 20 * cm;
 	fWireCentDist = 5 * cm;
 	pmtReflectivity = 0.50;
+	fPENShellLength = 10 * cm;
+	fPENShellRadius = 5 * cm;
 	G4cout << "Start Construction" << G4endl;
 	DefineMat();
 	fTargetMaterial = G4Material::GetMaterial("PVT_structure");
@@ -750,6 +752,9 @@ G4VPhysicalVolume* PENDetectorConstruction::Construct()
 	  auto solidPENShell = new G4Tubs("solidPENShell", outerGeRadius + LN2Gap, outerGeRadius + LN2Gap + ShellThickness, PENShellHeight / 2, 0., twopi);
 	  logicPENShell = new G4LogicalVolume(solidPENShell, matPEN, "logicPENShell");
 	  physPENShell = new G4PVPlacement(0, G4ThreeVector(), logicPENShell, "PENShell", logicEnv, false, 0, checkOverlaps);
+	  fPENShellLength = PENShellHeight;
+	  fPENShellRadius = outerGeRadius + LN2Gap + ShellThickness + 1 * mm;
+
   }
 
   else if (fLayerNb == 2) {
@@ -787,7 +792,8 @@ G4VPhysicalVolume* PENDetectorConstruction::Construct()
 	  solidPENShell->Voxelize();
 	  logicPENShell = new G4LogicalVolume(solidPENShell, matPEN, "logicPENShell");
 	  physPENShell = new G4PVPlacement(0, G4ThreeVector(), logicPENShell, "PENShell", logicEnv, false, 0, checkOverlaps);
-
+	  fPENShellRadius = outerGeRadius + LN2Gap + ShellThickness + wireradius * 2 + ShellThickness + 1 * mm;
+	  fPENShellLength = PENShellHeight + fPENShellRadius * 4;
   
   }
 

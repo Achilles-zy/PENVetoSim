@@ -12,7 +12,6 @@
 #include "G4LogicalSkinSurface.hh"
 #include "G4LogicalBorderSurface.hh"
 #include "PENMaterials.hh"
-#include "PENMaterials.hh"
 #include "PENDetectorMessenger.hh"
 #include "PENDetectorConstruction.hh"
 //#include "TMath.h"
@@ -64,6 +63,14 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
 
         G4int GetLayerNb() {
             return fLayerNb;
+        }
+
+        G4double GetPENShellLength() {
+            return fPENShellLength;
+        }
+
+        G4double GetPENShellRadius() {
+            return fPENShellRadius;
         }
 
     private:
@@ -163,6 +170,8 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
         G4double fWireCentDist;
         G4double fWireRadius;
         G4double fWireLength;
+        G4double fPENShellRadius;
+        G4double fPENShellLength;
         PENDetectorMessenger* fDetectorMessenger;
         
 };
