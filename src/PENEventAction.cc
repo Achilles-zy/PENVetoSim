@@ -32,7 +32,7 @@ PENEventAction::PENEventAction(PENRunAction* runaction)
 	SiPM_15(0),
 	Total(0),
 	ID(0),
-	PhotonCount(0),
+    SiPMPhotonCount(0),
 	ifSiPM(false),
 	ifBulk(false),
     ifDetectable(false),
@@ -90,9 +90,11 @@ void PENEventAction::BeginOfEventAction(const G4Event* evt)
   SiPM_14 = 0;
   SiPM_15 = 0;
   Total = 0;
-  PhotonCount = 0;
+  SiPMPhotonCount = 0;
+  EscapedPhotonCount = 0;
   ifSiPM = false;
   ifBulk = false;
+  ifDetectable = false;
   // G4cout<<ID<<G4endl;
 }
 
@@ -103,9 +105,8 @@ void PENEventAction::EndOfEventAction(const G4Event* evt)
 
   auto analysisManager = G4AnalysisManager::Instance();
   analysisManager->FillH1(0, edepBulk);
-  analysisManager->FillH1(1, PhotonCount);
-
-	if (edepBulk > 0 && PhotonCount > 0) {
+  analysisManager->FillH1(1, SiPMPhotonCount);
+	if (edepBulk > 0 && SiPMPhotonCount > 0) {
 		run->CountVetoEvent();
     }
 
@@ -113,7 +114,7 @@ void PENEventAction::EndOfEventAction(const G4Event* evt)
 		run->CountBulkEvent();
 	}
 
-	if (PhotonCount > 0) {
+	if (SiPMPhotonCount > 0) {
 		run->CountSiPMEvent();
 	}
 

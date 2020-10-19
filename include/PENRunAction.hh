@@ -7,15 +7,17 @@
 #include "globals.hh"
 #include "G4AccumulableManager.hh"
 #include "G4Accumulable.hh"
-#include "PENDetectorConstruction.hh"
 #include "PENPrimaryGeneratorAction.hh"
+#include "PENDetectorConstruction.hh"
+
 class G4Run;
 class PENPrimaryGeneratorAction;
+class PENDetectorConstruction;
 
 class PENRunAction : public G4UserRunAction
 {
     public:
-    PENRunAction(PENPrimaryGeneratorAction*);
+    PENRunAction(PENPrimaryGeneratorAction*, PENDetectorConstruction*);
     ~PENRunAction();
 
     void BeginOfRunAction(const G4Run*);
@@ -44,11 +46,14 @@ private:
 	//G4int SiPMEventCount;
 	//G4int VetoEventCount;
 	PENPrimaryGeneratorAction* fPrimaryGenerator;
+	PENDetectorConstruction* fDetCons;
 	G4Accumulable<G4int> SiPMEventCount;
 	G4Accumulable<G4int> VetoEventCount;
 	G4Accumulable<G4int> BulkEventCount;
 	G4Accumulable<G4int> DetectableEventCount;
 	G4Accumulable<G4int> VetoPossibleEvtCount;
+	G4String filename;
+	G4String txtname;
 };
 
 #endif

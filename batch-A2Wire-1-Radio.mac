@@ -1,0 +1,91 @@
+#Radioactive decay simulation
+/control/verbose 0
+/control/saveHistory
+/run/verbose 0
+#
+# Change the default number of threads (in multi-threaded mode)
+/run/numberOfThreads 16
+#
+
+/PEN/det/set/wiretype A2
+/PEN/det/set/layernumber 1
+/PEN/det/set/confine Wire
+
+# Initialize kernel
+/run/initialize
+# Confine src to the wire
+# Default confinement of src is Wire
+#/gps/pos/confine Wire
+
+
+#run 0
+/gps/particle ion
+/gps/ion 90 232 0 0
+/gps/energy 0 keV
+/run/beamOn 1000000
+
+#run 1
+/gps/particle ion
+/gps/ion 88 228 0 0
+/gps/energy 0 keV
+/run/beamOn 1000000
+
+#run 2
+/gps/particle ion
+/gps/ion 89 228 0 0
+/gps/energy 0 keV
+/run/beamOn 1000000
+
+#run 3
+/gps/particle ion
+/gps/ion 90 228 0 0
+/gps/energy 0 keV
+/run/beamOn 1000000
+
+#run 4
+/gps/particle ion
+/gps/ion 88 224 0 0
+/gps/energy 0 keV
+/run/beamOn 1000000
+
+#run 5
+/gps/particle ion
+/gps/ion 86 220 0 0
+/gps/energy 0 keV
+/run/beamOn 1000000
+
+#run 6
+/gps/particle ion
+/gps/ion 84 216 0 0
+/gps/energy 0 keV
+/run/beamOn 1000000
+
+#run 7
+/gps/particle ion
+/gps/ion 84 216 0 0
+/gps/energy 0 keV
+/run/beamOn 1000000
+
+#run 8
+/gps/particle ion
+/gps/ion 82 212 0 0
+/gps/energy 0 keV
+/run/beamOn 1000000
+
+#run 9
+/gps/particle ion
+/gps/ion 83 212 0 0
+/gps/energy 0 keV
+/run/beamOn 1000000
+
+#run 10
+/gps/particle ion
+/gps/ion 84 212 0 0
+/gps/energy 0 keV
+/run/beamOn 1000000
+
+#run 11
+/gps/particle ion
+/gps/ion 81 208 0 0
+/gps/energy 0 keV
+/run/beamOn 1000000

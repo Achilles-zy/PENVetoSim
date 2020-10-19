@@ -8,10 +8,12 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PENActionInitialization::PENActionInitialization()
+PENActionInitialization::PENActionInitialization(PENDetectorConstruction* det)
 	: G4VUserActionInitialization()
 {
-	fPrimaryGenerator = new PENPrimaryGeneratorAction();
+	fDetCons = det;
+	fPrimaryGen = new PENPrimaryGeneratorAction(fDetCons);
+	
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -23,7 +25,8 @@ PENActionInitialization::~PENActionInitialization()
 
 void PENActionInitialization::BuildForMaster() const
 {
-	PENRunAction* runAction = new PENRunAction(fPrimaryGenerator);
+	PENPrimaryGeneratorAction* gen = new PENPrimaryGeneratorAction(fDetCons);
+	PENRunAction* runAction = new PENRunAction(fPrimaryGen, fDetCons);
 	SetUserAction(runAction);
 }
 
@@ -31,15 +34,18 @@ void PENActionInitialization::BuildForMaster() const
 
 void PENActionInitialization::Build() const
 {
-	SetUserAction(fPrimaryGenerator);
+	PENPrimaryGeneratorAction* gen = new PENPrimaryGeneratorAction(fDetCons);
+	//fPrimaryGen = gen;
+	SetUserAction(fPrimaryGen);
 
-	PENRunAction* runAction = new PENRunAction(fPrimaryGenerator);
+	PENRunAction* runAction = new PENRunAction(gen, fDetCons);
 	SetUserAction(runAction);
-
+	
 	PENEventAction* eventAction = new PENEventAction(runAction);
 	SetUserAction(eventAction);
 
 	SetUserAction(new PENSteppingAction(eventAction));
+	//SetUserAction(new PENTrackingAction(eventAction));
 	//SetUserAction(new PENTrackingAction(eventAction));
 	SetUserAction(new PENStackingAction);
 }

@@ -3,19 +3,25 @@
 
 #include "G4VUserActionInitialization.hh"
 
-/// Action initialization class.
+#include "PENPrimaryGeneratorAction.hh"
+#include "PENDetectorConstruction.hh"
+
 class PENPrimaryGeneratorAction;
+class PENDetectorConstruction;
+/// Action initialization class.
+
 class PENActionInitialization : public G4VUserActionInitialization
 {
 public:
-	PENActionInitialization();
+	PENActionInitialization(PENDetectorConstruction*);
 	virtual ~PENActionInitialization();
 
 	virtual void BuildForMaster() const;
 	virtual void Build() const;
 
 private:
-	PENPrimaryGeneratorAction* fPrimaryGenerator;
+	PENPrimaryGeneratorAction* fPrimaryGen;
+	PENDetectorConstruction* fDetCons;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

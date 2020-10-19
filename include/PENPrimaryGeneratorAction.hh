@@ -3,13 +3,16 @@
 
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "PENDetectorConstruction.hh"
+
 class G4GeneralParticleSource;
 class G4Event;
+class PENDetectorConstruction;
 
 class PENPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
+
 public:
-    PENPrimaryGeneratorAction();
+    PENPrimaryGeneratorAction(PENDetectorConstruction*);
     ~PENPrimaryGeneratorAction();
     void GeneratePrimaries(G4Event* anEvent);
     G4double GetPrimaryE() {
@@ -24,6 +27,7 @@ private:
     G4double PrimaryE;
     G4String PrimaryName;
     PENDetectorConstruction* fDetCons;
+
 };
 
 #endif

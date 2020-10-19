@@ -69,7 +69,7 @@ int main(int argc, char** argv)
 	physicslist->SetVerboseLevel(0);
     PENRunManager -> SetUserInitialization(physicslist);
 
-    PENRunManager -> SetUserInitialization(new PENActionInitialization());
+    PENRunManager -> SetUserInitialization(new PENActionInitialization(PENDetCons));
 
     G4UImanager* UImanager = G4UImanager::GetUIpointer();
     UImanager->ApplyCommand("/run/verbose 0");
