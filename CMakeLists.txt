@@ -3,7 +3,7 @@
 #----------------------------------------------------------------------------
 # Setup the project
 cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
-project(PEN-Wire)
+project(PENVetoSim)
 
 # Load some basic macros which are needed later on
 #include(FindROOT.cmake)
@@ -44,17 +44,17 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 #
-add_executable(PEN-Wire PENVetoSim.cc ${sources} ${headers})
+add_executable(PENVetoSim PENVetoSim.cc ${sources} ${headers})
 #target_link_libraries(PENVetoSim ${Geant4_LIBRARIES})
 #target_link_libraries(PENVetoSim ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
-target_link_libraries(PEN-Wire ${Geant4_LIBRARIES})
+target_link_libraries(PENVetoSim ${Geant4_LIBRARIES})
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
 # build B1. This is so that we can run the executable directly because it
 # relies on these scripts being in the current working directory.
 #
-set(PEN-Wire_SCRIPTS
+set(PENVetoSim_SCRIPTS
   #exampleB1.in
   #exampleB1.out
   init_vis.mac
@@ -75,7 +75,7 @@ set(PEN-Wire_SCRIPTS
   src1.mac
   )
 
-foreach(_script ${PEN-Wire_SCRIPTS})
+foreach(_script ${PENVetoSim_SCRIPTS})
   configure_file(
     ${PROJECT_SOURCE_DIR}/${_script}
     ${PROJECT_BINARY_DIR}/${_script}
@@ -87,11 +87,11 @@ endforeach()
 # For internal Geant4 use - but has no effect if you build this
 # example standalone
 #
-#add_custom_target(PEN-Wire.exe DEPENDS PEN-Wire)
+#add_custom_target(PENVetoSim.exe DEPENDS PENVetoSim)
 
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
-install(TARGETS PEN-Wire DESTINATION bin)
+install(TARGETS PENVetoSim DESTINATION bin)
 
 

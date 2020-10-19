@@ -1,4 +1,4 @@
-# PEN-WireVetoSim
+# PENVetoSim
 
 9/24
 
