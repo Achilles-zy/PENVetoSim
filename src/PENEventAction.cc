@@ -126,8 +126,11 @@ void PENEventAction::EndOfEventAction(const G4Event* evt)
         run->CountVetoPossibleEvent();
     }
 
+
+
+
     G4int evtID = evt->GetEventID();
-    //G4cout << "Photoncount =" << PhotonCount << G4endl;
+
     if (evtID % 5000 == 0) {
         G4cout << evtID << G4endl;
     }

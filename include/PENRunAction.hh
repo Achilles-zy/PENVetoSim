@@ -23,11 +23,13 @@ class PENRunAction : public G4UserRunAction
     void BeginOfRunAction(const G4Run*);
     void EndOfRunAction(const G4Run*);
 
-	void CountBulkEvent() {
-		BulkEventCount += 1;
-	};
+
 	void CountSiPMEvent() { 
 		SiPMEventCount += 1;
+	};
+
+	void CountBulkEvent() {
+		BulkEventCount += 1;
 	};
 	void CountVetoEvent() {
 		VetoEventCount += 1;
@@ -36,6 +38,19 @@ class PENRunAction : public G4UserRunAction
 		DetectableEventCount += 1;
 	}
 	void CountVetoPossibleEvent() {
+		VetoPossibleEvtCount += 1;
+	}
+
+	void CountROIBulkEvent() {
+		BulkEventCount += 1;
+	};
+	void CountROIVetoEvent() {
+		VetoEventCount += 1;
+	}
+	void CountROIDetectableEvent() {
+		DetectableEventCount += 1;
+	}
+	void CountROIVetoPossibleEvent() {
 		VetoPossibleEvtCount += 1;
 	}
 
@@ -48,10 +63,19 @@ private:
 	PENPrimaryGeneratorAction* fPrimaryGenerator;
 	PENDetectorConstruction* fDetCons;
 	G4Accumulable<G4int> SiPMEventCount;
+
 	G4Accumulable<G4int> VetoEventCount;
 	G4Accumulable<G4int> BulkEventCount;
 	G4Accumulable<G4int> DetectableEventCount;
 	G4Accumulable<G4int> VetoPossibleEvtCount;
+
+	G4Accumulable<G4int> ROIVetoEventCount;
+	G4Accumulable<G4int> ROIBulkEventCount;
+	G4Accumulable<G4int> ROIDetectableEventCount;
+	G4Accumulable<G4int> ROIVetoPossibleEvtCount;
+
+
+
 	G4String filename;
 	G4String txtname;
 };

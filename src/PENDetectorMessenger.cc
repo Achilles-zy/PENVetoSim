@@ -30,19 +30,28 @@ PENDetectorMessenger::PENDetectorMessenger(PENDetectorConstruction* Det)
 	cmdSetLayerNb(0)
 {
 	fDetDir = new G4UIdirectory("/PEN/det/set");
-	fDetDir->SetGuidance("detector construction commands");
+	fDetDir->SetGuidance("Set detector construction parameters");
+
+	fPENDir = new G4UIdirectory("/PEN/sim/set");
+	fPENDir->SetGuidance("Set simulation parameters");
 
 	cmdSetWireType = new G4UIcmdWithAString("/PEN/det/set/wiretype", this);
 	cmdSetWireType->SetGuidance("Select wire type.");
-	cmdSetWireType->SetParameterName("choice", false);
+	cmdSetWireType->SetParameterName("WireType", false);
 	cmdSetWireType->AvailableForStates(G4State_PreInit, G4State_Idle);
 	cmdSetWireType->SetToBeBroadcasted(false);
 
 	cmdSetConfine = new G4UIcmdWithAString("/PEN/det/set/confine", this);
 	cmdSetConfine->SetGuidance("Set confine name in file name.");
-	cmdSetConfine->SetParameterName("choice", false);
+	cmdSetConfine->SetParameterName("ConfineInfo", false);
 	cmdSetConfine->AvailableForStates(G4State_PreInit, G4State_Idle);
 	cmdSetConfine->SetToBeBroadcasted(false);
+
+	cmdSetMode = new G4UIcmdWithAString("/PEN/sim/set/mode", this);
+	cmdSetMode->SetGuidance("Select simulation mode.");
+	cmdSetMode->SetParameterName("SimulationMode", false);
+	cmdSetMode->AvailableForStates(G4State_PreInit, G4State_Idle);
+	cmdSetMode->SetToBeBroadcasted(false);
 
 	cmdSetLayerNb = new G4UIcmdWithAnInteger("/PEN/det/set/layernumber", this);
 	cmdSetLayerNb->SetGuidance("Set PEN shell layer number");
@@ -73,6 +82,10 @@ void PENDetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
 
 	if (command == cmdSetConfine) {
 		fDetCons->SetConfine(newValue);
+	}
+
+	if (command == cmdSetMode) {
+		fDetCons->SetMode(newValue);
 	}
 
 	if (command == cmdSetLayerNb) {

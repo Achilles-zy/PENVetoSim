@@ -98,55 +98,59 @@ void PENPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 	G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
 	//G4String particleName = "e-";
 	//G4double particleEnergy = 0 * MeV;
+	G4String mode = fDetCons->GetMode();
+	if (mode == "CDEX") {
+		if (SrcType == "Wire") {
+			G4double Radius = fDetCons->GetWireRadius();
+			G4double Length = fDetCons->GetWireLength();
+			G4ThreeVector WirePos = fDetCons->GetWirePos();
+			G4cout << "==========================Primary Info==========================" << G4endl;
+			G4cout << "Wire Position: " << WirePos << G4endl;
+			G4cout << "Wire Radius: " << Radius << G4endl;
+			G4cout << "Wire Length: " << Length << G4endl;
+			G4cout << "================================================================" << G4endl;
+			//fPENGPS->SetParticleDefinition(particleTable->FindParticle(particleName));
+			fPENGPS->GetCurrentSource()->GetEneDist()->SetEnergyDisType("Mono");
+			//fPENGPS->GetCurrentSource()->GetEneDist()->SetMonoEnergy(particleEnergy);
+			fPENGPS->GetCurrentSource()->GetAngDist()->SetAngDistType("iso");
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetPosDisType("Volume");
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetPosDisShape("Cylinder");
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetCentreCoords(WirePos);
+			//fPENGPS->GetCurrentSource()->GetPosDist()->SetCentreCoords(G4ThreeVector(0, 0, 0));
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetRadius(Radius);
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetHalfZ(Length / 2);
 
-	if (SrcType == "Wire") {
-		G4double Radius = fDetCons->GetWireRadius();
-		G4double Length = fDetCons->GetWireLength();
-		G4ThreeVector WirePos = fDetCons->GetWirePos();
-		G4cout << "==========================Primary Info==========================" << G4endl;
-		G4cout << "Wire Position: " << WirePos << G4endl;
-		G4cout << "Wire Radius: " << Radius << G4endl;
-		G4cout << "Wire Length: " << Length << G4endl;
-		G4cout << "================================================================" << G4endl;
-		//fPENGPS->SetParticleDefinition(particleTable->FindParticle(particleName));
-		fPENGPS->GetCurrentSource()->GetEneDist()->SetEnergyDisType("Mono");
-		//fPENGPS->GetCurrentSource()->GetEneDist()->SetMonoEnergy(particleEnergy);
-		fPENGPS->GetCurrentSource()->GetAngDist()->SetAngDistType("iso");
-		fPENGPS->GetCurrentSource()->GetPosDist()->SetPosDisType("Volume");
-		fPENGPS->GetCurrentSource()->GetPosDist()->SetPosDisShape("Cylinder");
-		fPENGPS->GetCurrentSource()->GetPosDist()->SetCentreCoords(WirePos);
-		//fPENGPS->GetCurrentSource()->GetPosDist()->SetCentreCoords(G4ThreeVector(0, 0, 0));
-		fPENGPS->GetCurrentSource()->GetPosDist()->SetRadius(Radius);
-		fPENGPS->GetCurrentSource()->GetPosDist()->SetHalfZ(Length / 2);
+			fPENGPS->GetCurrentSource()->GetPosDist()->ConfineSourceToVolume("Wire");
+			//fPENGPS->GetCurrentSource()->GetPosDist()->ConfineSourceToVolume("PENShell");
+		}
 
-		fPENGPS->GetCurrentSource()->GetPosDist()->ConfineSourceToVolume("Wire");
-		//fPENGPS->GetCurrentSource()->GetPosDist()->ConfineSourceToVolume("PENShell");
+		else if (SrcType == "PENShell") {
+			G4double Radius = fDetCons->GetPENShellRadius();
+			G4double Length = fDetCons->GetPENShellLength();
+			G4cout << "==========================Primary Info==========================" << G4endl;
+			G4cout << "Sample Region Radius: " << Radius << G4endl;
+			G4cout << "Sample Region Length: " << Length << G4endl;
+			G4cout << "================================================================" << G4endl;
+			//fPENGPS->SetParticleDefinition(particleTable->FindParticle(particleName));
+			fPENGPS->GetCurrentSource()->GetEneDist()->SetEnergyDisType("Mono");
+			//fPENGPS->GetCurrentSource()->GetEneDist()->SetMonoEnergy(particleEnergy);
+			fPENGPS->GetCurrentSource()->GetAngDist()->SetAngDistType("iso");
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetPosDisType("Volume");
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetPosDisShape("Cylinder");
+			//fPENGPS->GetCurrentSource()->GetPosDist()->SetCentreCoords(WirePos);
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetRadius(Radius * 2);
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetHalfZ(Length / 2);
+
+			//fPENGPS->GetCurrentSource()->GetPosDist()->ConfineSourceToVolume("Wire");
+			fPENGPS->GetCurrentSource()->GetPosDist()->ConfineSourceToVolume("PENShell");
+		}
+
+		else {
+			G4cout << "Error: Src type not found!" << G4endl;
+		}
 	}
 
-	else if (SrcType == "PENShell") {
-		G4double Radius = fDetCons->GetPENShellRadius();
-		G4double Length = fDetCons->GetPENShellLength();
-		G4cout << "==========================Primary Info==========================" << G4endl;
-		G4cout << "Sample Region Radius: " << Radius << G4endl;
-		G4cout << "Sample Region Length: " << Length << G4endl;
-		G4cout << "================================================================" << G4endl;
-		//fPENGPS->SetParticleDefinition(particleTable->FindParticle(particleName));
-		fPENGPS->GetCurrentSource()->GetEneDist()->SetEnergyDisType("Mono");
-		//fPENGPS->GetCurrentSource()->GetEneDist()->SetMonoEnergy(particleEnergy);
-		fPENGPS->GetCurrentSource()->GetAngDist()->SetAngDistType("iso");
-		fPENGPS->GetCurrentSource()->GetPosDist()->SetPosDisType("Volume");
-		fPENGPS->GetCurrentSource()->GetPosDist()->SetPosDisShape("Cylinder");
-		//fPENGPS->GetCurrentSource()->GetPosDist()->SetCentreCoords(WirePos);
-		fPENGPS->GetCurrentSource()->GetPosDist()->SetRadius(Radius * 2);
-		fPENGPS->GetCurrentSource()->GetPosDist()->SetHalfZ(Length / 2);
 
-		//fPENGPS->GetCurrentSource()->GetPosDist()->ConfineSourceToVolume("Wire");
-		fPENGPS->GetCurrentSource()->GetPosDist()->ConfineSourceToVolume("PENShell");
-	}
-
-	else {
-		G4cout << "Error: Src type not found!" << G4endl;
-	}
 	
     fPENGPS->GeneratePrimaryVertex(anEvent);
 	anEvent->GetEventID();

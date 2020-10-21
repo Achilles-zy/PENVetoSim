@@ -33,11 +33,14 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
         const G4VPhysicalVolume* GetEnv() const;
 
         G4VPhysicalVolume* Construct();
+        G4VPhysicalVolume* ConstructLEGEND();
+        G4VPhysicalVolume* ConstructCDEX();
         void DefineMat();
 
         void SetABS(G4double);
         void SetWireType(G4String);
         void SetConfine(G4String);
+        void SetMode(G4String);
         void SetLayerNb(G4int);
         //void SetLayerNbS(G4String);
 
@@ -59,6 +62,10 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
 
         G4String GetConfine() {
             return fConfine;
+        }
+
+        G4String GetMode() {
+            return fMode;
         }
 
         G4int GetLayerNb() {
@@ -165,6 +172,7 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
         G4String fABSFile;
         G4String fType;
         G4String fConfine;
+        G4String fMode;
         G4int fLayerNb;
         G4ThreeVector fWirePos;
         G4double fWireCentDist;

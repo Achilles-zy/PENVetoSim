@@ -86,6 +86,7 @@ PENDetectorConstruction::PENDetectorConstruction():
 	fABSFile = "PEN_ABS";
 	fConfine = "Wire";
 	fType = "A1";
+	fMode = "LEGEND";
 	fLayerNb = 2;
 	fWirePos = G4ThreeVector();
 	fWireRadius = 0.7 * mm;
@@ -114,6 +115,12 @@ void PENDetectorConstruction::SetConfine(G4String confine) {
 	fConfine = confine;
 	G4RunManager::GetRunManager()->ReinitializeGeometry();
 }
+
+void PENDetectorConstruction::SetMode(G4String mode) {
+	fMode = mode;
+	G4RunManager::GetRunManager()->ReinitializeGeometry();
+}
+
 
 
 void PENDetectorConstruction::SetLayerNb(G4int nb) {
@@ -469,9 +476,22 @@ void PENDetectorConstruction::SetABS(G4double value) {
 #endif
 }
 
-
-
 G4VPhysicalVolume* PENDetectorConstruction::Construct()
+{
+	if (fMode == "CDEX") {
+		return ConstructCDEX();
+	}
+	else if (fMode == "LEGEND") {
+		return ConstructLEGEND();
+	}
+	else {
+		G4cout << "Error: Mode not fount!" << G4endl;
+	}
+	
+}
+
+
+G4VPhysicalVolume* PENDetectorConstruction::ConstructCDEX()
 {
 	G4NistManager* nist = G4NistManager::Instance();
 
@@ -1013,5 +1033,233 @@ G4VPhysicalVolume* PENDetectorConstruction::Construct()
   //SiPM_11 = physSiPM11;
 
   return physWorld;
+}
+
+
+
+G4VPhysicalVolume* PENDetectorConstruction::ConstructLEGEND()
+{
+	G4NistManager* nist = G4NistManager::Instance();
+
+
+	// Option to switch on/off checking of volumes overlaps
+	//
+	G4bool checkOverlaps = true;
+
+	//Vaccum for world
+	//G4Material* vacuum=new G4Material("Galactic",z=1.,a=1.01*g/mole,density=universe_mean_density,kStateGas,2.73*kelvin,3.e-18*pascal);
+
+  //------------------------------------------------------ volumes
+  //
+	G4Material* world_mat = fVacuum;
+	G4Material* env_mat = matLN2;
+	G4Material* det_mat = matEnGe;
+
+	//     
+	// World&Envelope
+	//
+	G4double world_size = 200 * cm;
+	G4double env_size = 180 * cm;
+	G4Box* solidWorld = new G4Box("World", 0.5 * world_size, 0.5 * world_size, 0.5 * world_size);
+	G4LogicalVolume* logicWorld = new G4LogicalVolume(solidWorld, world_mat, "World");
+	G4VPhysicalVolume* physWorld =
+		new G4PVPlacement(0,                     //no rotation
+			G4ThreeVector(),       //at (0,0,0)
+			logicWorld,            //its logical volume
+			"World",               //its name
+			0,                     //its mother  volume
+			false,                 //no boolean operation
+			0,                     //copy number
+			checkOverlaps);        //overlaps checking
+
+	G4Box* solidEnv = new G4Box("Envelope", 0.5 * env_size, 0.5 * env_size, 0.5 * env_size);
+	G4LogicalVolume* logicEnv = new G4LogicalVolume(solidEnv, env_mat, "Envelope");
+	auto physEnv = new G4PVPlacement(0, G4ThreeVector(), logicEnv, "Envelope", logicWorld, false, 0, checkOverlaps);
+
+	//flatBEGe
+	double GeChamfer = 2. * mm;
+	double outerGeRadius = 31.35 * mm;
+	double innerGeRadius = 1.50 * mm;
+	double GeHeight1 = 60.80 * mm;
+	double SrcThickness = 0.01 * mm;
+	double lSmallValue = 0.01 * mm;
+	double groovedepth = 1.5 * mm;
+	double grooveradius = 9 * mm;
+	double groovethickness = 0.001 * mm;
+	double outerplayerthickness = 1 * um;
+	G4double orbradius = 1.89 * mm;
+	G4double deadlayerthickness = 1 * mm;
+
+	// G4Height2 is the depth of the hole for pin contact
+	double GeHeight2 = 4.0 * mm;
+	double GeHeight3 = GeHeight2 + deadlayerthickness;
+
+	auto GeP1 = new G4Tubs("GeP1", 0., outerGeRadius, GeHeight1 / 2, 0., twopi);
+	auto GeP2 = new G4Tubs("GeP2", 0., outerGeRadius - GeChamfer, GeChamfer, 0., twopi);
+	auto GeP3 = new G4Torus("GeP3", 0., GeChamfer, outerGeRadius - GeChamfer, 0., twopi);
+	auto GeGroove = new G4Torus("solidgroove", 0., groovedepth, grooveradius, 0., twopi);
+
+	//auto GeCut = new G4Tubs("solidGeCut", 0., 3 * cm, GeHeight2 / 2, 0., twopi);
+	//auto GeM2 = new G4Tubs("solidGeM2", 0., innerGeRadius, GeHeight3 / 2., 0., twopi);
+
+	G4ThreeVector zTransGe0(0., 0., -GeHeight1 / 2);
+	G4ThreeVector zTransGe1(0., 0., -GeHeight1 / 2 + deadlayerthickness);
+	G4ThreeVector zTransGe2(0., 0., GeHeight1 / 2 + lSmallValue);
+	G4ThreeVector zTransGroove(0., 0., -GeHeight1 / 2);
+
+	// total germanium crystal
+	auto GeTemp1 = new G4UnionSolid("GeTemp1", GeP2, GeP3);
+	auto GeTemp2 = new G4UnionSolid("GeTemp2", GeP1, GeTemp1, 0, zTransGe2);
+	//?
+	//auto solidtempTotalCrystal = new G4SubtractionSolid("totaltempCrystal", GeTemp2, GeGroove, 0, zTransGroove);
+	auto solidTotalCrystal = new G4SubtractionSolid("totalCrystal", GeTemp2, GeGroove, 0, zTransGroove);
+	auto logicTotalCrystal = new G4LogicalVolume(solidTotalCrystal, det_mat, "logicTotalCrystal");
+
+	// bulk
+	auto GeP1In = new G4Tubs("GeP1In", 0., outerGeRadius - deadlayerthickness, (GeHeight1 - deadlayerthickness * 2) / 2, 0., twopi);
+	auto GeP2In = new G4Tubs("GeP2In", 0., outerGeRadius - deadlayerthickness - GeChamfer, GeChamfer, 0., twopi);
+	auto GeP3In = new G4Torus("GeP3In", 0., GeChamfer, outerGeRadius - deadlayerthickness - GeChamfer, 0., twopi);
+	auto GeP4In = new G4Tubs("GeP4In", 0., grooveradius, deadlayerthickness / 2, 0., twopi);
+
+	auto GeLargerGroove = new G4Torus("solidlargergroove", 0., groovedepth + groovethickness, grooveradius, 0., twopi);
+	auto GeOuterpLayer = new G4Tubs("solidouterplayer", 0., grooveradius - groovedepth, outerplayerthickness / 2, 0., twopi);
+	//auto GeOuterpLayer = new G4Tubs("solidouterplayer", 0., grooveradius - groovedepth - groovethickness, outerplayerthickness, 0., twopi);
+
+	auto GeInTemp1 = new G4UnionSolid("GeInTemp1", GeP2In, GeP3In);
+	auto GeInTemp2 = new G4UnionSolid("GeInTemp2", GeP1In, GeInTemp1, 0, G4ThreeVector(0., 0., (GeHeight1 - deadlayerthickness * 2) / 2.0 + lSmallValue));
+	auto GeInTemp3 = new G4UnionSolid("GeInTemp3", GeInTemp2, GeP4In, 0, G4ThreeVector(0., 0., -(GeHeight1 - deadlayerthickness) / 2));
+	G4ThreeVector zbulkTrans(0., 0., -(GeHeight1 - deadlayerthickness * 2 - (GeHeight2 - deadlayerthickness)) / 2);
+	G4ThreeVector zbulkTransOuterp(0., 0., -(GeHeight1 - outerplayerthickness) / 2);
+
+	auto GeInTemp4 = new G4SubtractionSolid("GeInTemp4", GeInTemp3, GeLargerGroove, 0, zTransGroove);
+	auto solidBulk = new G4SubtractionSolid("Bulk", GeInTemp4, GeOuterpLayer, 0, zbulkTransOuterp);
+	auto logicBulk = new G4LogicalVolume(solidBulk, det_mat, "Bulk");
+	//auto logicBulk = new G4LogicalVolume(GeInTemp4, det_mat, "Bulk");
+
+	//deadlayer
+	auto tempdeadlayer = new G4SubtractionSolid("tempdeadlayer", solidTotalCrystal, GeInTemp3, 0, G4ThreeVector(0., 0., 0.));
+	auto solidOuterDeadlayer = new G4SubtractionSolid("OuterDeadlayer", tempdeadlayer, GeLargerGroove, 0, zTransGroove);
+	auto logicOuterDeadlayer = new G4LogicalVolume(solidOuterDeadlayer, det_mat, "OuterDeadlayer");
+
+	//groove Layer
+	auto GrooveTorus = new G4Torus("solidpLayer", groovedepth, groovedepth + groovethickness, grooveradius, 0., twopi);
+	auto GrooveCut1 = new G4Tubs("groovecut1", 0, grooveradius + groovedepth + groovethickness, groovedepth + groovethickness, 0, twopi);
+	auto GrooveCut2 = new G4Tubs("groovecut2", 0, grooveradius - groovedepth, outerplayerthickness, 0, twopi);
+	auto tempGroove1 = new G4SubtractionSolid("tempgroove1", GrooveTorus, GrooveCut1, 0, G4ThreeVector(0., 0., -(groovedepth + groovethickness)));
+	auto GrooveLayer = new G4SubtractionSolid("GrooveLayer", tempGroove1, GrooveCut2, 0, G4ThreeVector(0., 0., 0.));
+	auto logicGrooveLayer = new G4LogicalVolume(GrooveLayer, det_mat, "GrooveLayer");
+
+	//outer pLayer
+	auto OuterpLayer = new G4Tubs("solidOuterpLayer", 0, grooveradius - groovedepth, outerplayerthickness / 2, 0, twopi);
+	auto logicOuterpLayer = new G4LogicalVolume(OuterpLayer, det_mat, "OuterpLayer");
+
+	auto physDet = new G4PVPlacement(0, G4ThreeVector(), logicTotalCrystal, "PhysDet", logicEnv, false, 0, checkOverlaps);
+	auto physBulk = new G4PVPlacement(0, G4ThreeVector(), logicBulk, "Bulk", logicTotalCrystal, false, 0, checkOverlaps);
+	//new G4PVPlacement(0, G4ThreeVector(), logicOuterDeadlayer, "OuterDeadlayer", logicTotalCrystal, false, 0, checkOverlaps);
+	//new G4PVPlacement(0, zbulkTransOuterp, logicOuterpLayer, "OuterpLayer", logicTotalCrystal, false, 0, checkOverlaps);
+	//new G4PVPlacement(0, zTransGroove, logicGrooveLayer, "GrooveLayer", logicTotalCrystal, false, 0, checkOverlaps);
+
+
+
+	//========================PEN shell and wire paremeters========================//
+
+	G4String WireType = fType;
+	G4int LayerNb = fLayerNb;
+	G4double wireradius = 0.7 * mm;
+	G4double LN2Gap = 1 * mm;
+	G4double ShellThickness = 0.3 * cm;
+	G4double PENShellHeight = GeHeight1 + 2 * LN2Gap;
+	G4double WireLength = PENShellHeight;
+
+	//=============================================================================//
+	auto solidPENShell_side = new G4Tubs("solidPENShell_side", outerGeRadius + LN2Gap, outerGeRadius + LN2Gap + ShellThickness, PENShellHeight / 2, 0., twopi);
+	auto solidPENShell_top = new G4Tubs("solidPENShell_top", 0, outerGeRadius + LN2Gap + ShellThickness, ShellThickness / 2, 0., twopi);
+	auto solidPENShell_bottom = new G4Tubs("solidPENShell_bottom", 0, outerGeRadius + LN2Gap + ShellThickness, ShellThickness / 2, 0., twopi);
+	//auto logicLG1 = new G4LogicalVolume(solidLG1, matPEN, "logicLG1");
+	//auto physLG1 = new G4PVPlacement(0, G4ThreeVector(10 * cm, 0, 0), logicLG1, "LG1", logicEnv, false, 0, checkOverlaps);
+
+	G4MultiUnion* solidPENShell = new G4MultiUnion("solidPENShell");
+	// Add the shapes to the structure
+	//
+	G4RotationMatrix rotm = G4RotationMatrix();
+	G4ThreeVector u = G4ThreeVector(1, 0, 0);
+	G4ThreeVector v = G4ThreeVector(0, -1, 0);
+	G4ThreeVector w = G4ThreeVector(0, 0, -1);
+	G4RotationMatrix rotm1 = G4RotationMatrix(u, v, w);
+	G4ThreeVector position0 = G4ThreeVector(0., 0., 0.);
+	G4ThreeVector position1 = G4ThreeVector(0., 0., PENShellHeight / 2 + LN2Gap + ShellThickness / 2);
+	G4ThreeVector position2 = G4ThreeVector(0., 0., -PENShellHeight / 2 - LN2Gap - ShellThickness / 2);
+	G4Transform3D tr0 = G4Transform3D(rotm, position0);
+	G4Transform3D tr1 = G4Transform3D(rotm, position1);
+	G4Transform3D tr2 = G4Transform3D(rotm, position2);
+
+	solidPENShell->AddNode(*solidPENShell_side, tr0);
+	solidPENShell->AddNode(*solidPENShell_top, tr1);
+	solidPENShell->AddNode(*solidPENShell_bottom, tr2);
+
+	// Finally close the structure
+	//
+	solidPENShell->Voxelize();
+	logicPENShell = new G4LogicalVolume(solidPENShell, matPEN, "logicPENShell");
+	//physPENShell = new G4PVPlacement(0, G4ThreeVector(), logicPENShell, "PENShell", logicEnv, false, 0, checkOverlaps);
+	fPENShellRadius = outerGeRadius + LN2Gap + ShellThickness + wireradius * 2 + ShellThickness + 1 * mm;
+	fPENShellLength = PENShellHeight + fPENShellRadius * 4;
+
+	auto physPENShell = new G4PVPlacement(0, G4ThreeVector(), logicPENShell, "PENShell", logicEnv, false, 0, checkOverlaps);
+
+
+	/*
+	//Wire with PTFE
+	G4double WireLength = 20 * cm;
+	G4double SkinThickness = 0.5 * mm;
+	G4double CoreRadius = 0.2 * mm;
+	auto solidWire = new G4Tubs("solidWire", CoreRadius, CoreRadius + SkinThickness, WireLength, 0., twopi);
+	auto logicWire = new G4LogicalVolume(solidWire, matPTFE, "logicWire");
+	auto physWire = new G4PVPlacement(0, G4ThreeVector(outerGeRadius + LN2Gap + ShellThickness + CoreRadius + SkinThickness, 0, 0), logicWire, "Wire", logicEnv, false, 0, checkOverlaps);
+	//auto physWire = new G4PVPlacement(0, G4ThreeVector(10 * cm, 0, 0), logicWire, "Wire", logicEnv, false, 0, checkOverlaps);
+	auto solidCore = new G4Tubs("solidCore", 0, CoreRadius, WireLength, 0., twopi);
+	auto logicCore = new G4LogicalVolume(solidCore, matCu, "logicCore");
+	auto physCore = new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logicCore, "Core", logicWire, false, 0, checkOverlaps);
+	*/
+
+	//=============================================================//
+	//                                                             //
+	//                        LightReadout                         //
+	//                                                             //
+	//=============================================================//
+
+	G4double ReadoutRadius = outerGeRadius + LN2Gap + ShellThickness + 2 * cm;
+	G4double ReadoutThickness = 1 * cm;
+	auto solidReadout = new G4Tubs("solidReadout", ReadoutRadius, ReadoutRadius + ReadoutThickness, PENShellHeight * 2, 0., twopi);
+	auto logicReadout = new G4LogicalVolume(solidReadout, matSi, "logicReadout");;
+	auto physReadout = new G4PVPlacement(0, G4ThreeVector(), logicReadout, "Readout", logicEnv, false, 0, checkOverlaps);
+
+
+	const G4int NUMENTRIES_CHIP = 11;
+	const double hc = 6.62606876 * 2.99792458 * 100. / 1.602176462;
+	G4double sipm_pp[NUMENTRIES_CHIP] = { hc / 600. * eV, hc / 590. * eV, hc / 580. * eV, hc / 570. * eV, hc / 560. * eV, hc / 550. * eV, hc / 540. * eV, hc / 530. * eV, hc / 520. * eV,hc / 510. * eV,hc / 500. * eV };
+	G4double sipm_sl[NUMENTRIES_CHIP] = { 0,0,0,0,0,0,0,0,0,0,0 };
+	G4double sipm_ss[NUMENTRIES_CHIP] = { 0,0,0,0,0,0,0,0,0,0,0 };
+	G4double sipm_bs[NUMENTRIES_CHIP] = { 0,0,0,0,0,0,0,0,0,0,0 };
+	G4double sipm_rindex[NUMENTRIES_CHIP] = { 1.406,1.406,1.406,1.406,1.406,1.406,1.406,1.406,1.406,1.406,1.406 };
+	G4double sipm_reflectivity[NUMENTRIES_CHIP] = { 0,0,0,0,0,0,0,0,0,0,0 };
+	// G4double sipm_efficiency[NUMENTRIES_CHIP] = {0.20,0.21,0.23,0.25,0.26,0.28,0.30,0.32,0.34,0.36,0.38};
+	G4double sipm_efficiency[NUMENTRIES_CHIP] = { 1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0 };
+
+	G4MaterialPropertiesTable* SIPM_MPT_Surf = new G4MaterialPropertiesTable();
+	// SIPM_MPT_Surf->AddProperty("SPECULARLOBECONSTANT",sipm_pp,sipm_sl,NUMENTRIES_CHIP);
+	// SIPM_MPT_Surf->AddProperty("SPECULARSPIKECONSTANT",sipm_pp,sipm_ss,NUMENTRIES_CHIP);
+	// SIPM_MPT_Surf->AddProperty("BACKSCATTERCONSTANT",sipm_pp,sipm_bs,NUMENTRIES_CHIP);
+	SIPM_MPT_Surf->AddProperty("REFLECTIVITY", sipm_pp, sipm_reflectivity, NUMENTRIES_CHIP);
+	SIPM_MPT_Surf->AddProperty("EFFICIENCY", sipm_pp, sipm_efficiency, NUMENTRIES_CHIP);
+	// SIPM_MPT_Surf->AddProperty("RINDEX",sipm_pp,sipm_rindex,NUMENTRIES_CHIP);
+
+
+	Bulk = physBulk;
+	PENShell = physPENShell;
+	Env = physEnv;
+	physSiPM0 = physReadout;
+
+	return physWorld;
 }
 

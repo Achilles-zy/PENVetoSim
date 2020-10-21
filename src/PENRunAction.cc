@@ -11,11 +11,15 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
  
 PENRunAction::PENRunAction(PENPrimaryGeneratorAction* gen, PENDetectorConstruction* det):
-	BulkEventCount(0),
 	SiPMEventCount(0),
+	BulkEventCount(0),
 	VetoEventCount(0),
 	DetectableEventCount(0),
-	VetoPossibleEvtCount(0)
+	VetoPossibleEvtCount(0),
+	ROIBulkEventCount(0),
+	ROIVetoEventCount(0),
+	ROIDetectableEventCount(0),
+	ROIVetoPossibleEvtCount(0)
 {
   auto analysisManager = G4AnalysisManager::Instance();
   analysisManager->SetVerboseLevel(1);
