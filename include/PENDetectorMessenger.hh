@@ -34,8 +34,10 @@ private:
 
     G4UIcmdWithAString* cmdSetWireType;
     G4UIcmdWithAString* cmdSetConfine;
+    G4UIcmdWithAString* cmdSetRunInfo;
     G4UIcmdWithAString* cmdSetMode;
     G4UIcmdWithAnInteger* cmdSetLayerNb;
+    G4UIcmdWithADouble* cmdSetReadoutAngle;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

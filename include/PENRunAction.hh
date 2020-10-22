@@ -13,6 +13,7 @@
 class G4Run;
 class PENPrimaryGeneratorAction;
 class PENDetectorConstruction;
+class PENRunMessenger;
 
 class PENRunAction : public G4UserRunAction
 {
@@ -23,35 +24,38 @@ class PENRunAction : public G4UserRunAction
     void BeginOfRunAction(const G4Run*);
     void EndOfRunAction(const G4Run*);
 
+	void CDEXOutput(const G4Run* aRun);
+	void LEGENDOutput(const G4Run* aRun);
 
+	void RefreshOutput(G4bool b) {
+		ifRefresh = b;
+	}
 	void CountSiPMEvent() { 
 		SiPMEventCount += 1;
 	};
 
-	void CountBulkEvent() {
+	inline 	void CountBulkEvent() {
 		BulkEventCount += 1;
 	};
-	void CountVetoEvent() {
+	inline	void CountVetoEvent() {
 		VetoEventCount += 1;
 	}
-	void CountDetectableEvent() {
+	inline 	void CountDetectableEvent() {
 		DetectableEventCount += 1;
 	}
-	void CountVetoPossibleEvent() {
+	inline 	void CountVetoPossibleEvent() {
 		VetoPossibleEvtCount += 1;
 	}
 
-	void CountROIBulkEvent() {
-		BulkEventCount += 1;
-	};
-	void CountROIVetoEvent() {
+
+	inline 	void CountROIVetoEvent() {
 		VetoEventCount += 1;
 	}
-	void CountROIDetectableEvent() {
-		DetectableEventCount += 1;
-	}
-	void CountROIVetoPossibleEvent() {
+	inline 	void CountROIVetoPossibleEvent() {
 		VetoPossibleEvtCount += 1;
+	}
+	inline 	void CountROIEvent() {
+		ROIEventCount += 1;
 	}
 
 private:
@@ -70,14 +74,14 @@ private:
 	G4Accumulable<G4int> VetoPossibleEvtCount;
 
 	G4Accumulable<G4int> ROIVetoEventCount;
-	G4Accumulable<G4int> ROIBulkEventCount;
-	G4Accumulable<G4int> ROIDetectableEventCount;
+	G4Accumulable<G4int> ROIEventCount;
 	G4Accumulable<G4int> ROIVetoPossibleEvtCount;
 
 
-
+	PENRunMessenger* fPrimaryMessenger;
 	G4String filename;
 	G4String txtname;
+	G4bool ifRefresh;
 };
 
 #endif

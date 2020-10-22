@@ -28,9 +28,10 @@ void PENSteppingAction::UserSteppingAction(const G4Step* aStep)
 	auto volume = aStep->GetPostStepPoint()->GetTouchableHandle()->GetVolume();
 	auto particle_name = aStep->GetTrack()->GetParticleDefinition()->GetParticleName();
 
+	//G4cout << particle_name << G4endl;
 	auto edep = aStep->GetTotalEnergyDeposit();
 	if (PENEvent->GetSiPMPhotonCnt() > 3 && particle_name == "opticalphoton") {
-		aStep->GetTrack()->SetTrackStatus(fStopAndKill);
+		//aStep->GetTrack()->SetTrackStatus(fStopAndKill);
 	}
 
 	const PENDetectorConstruction* detectorConstruction
@@ -47,8 +48,12 @@ void PENSteppingAction::UserSteppingAction(const G4Step* aStep)
 	}
 
 	for (int i = 0; i <= 11; i++) {
-		if (volume == detectorConstruction->GetSiPM(i)&& particle_name == "opticalphoton") {
+		//G4cout << detectorConstruction->GetSiPM(i)->GetName()<<G4endl;
+		//G4cout << i << G4endl;
+		if (volume == detectorConstruction->GetSiPM(i) && particle_name == "opticalphoton" && detectorConstruction->GetSiPM(i) != nullptr) {
 			aStep->GetTrack()->SetTrackStatus(fStopAndKill);
+			//G4cout << i << G4endl;
+			//G4cout << detectorConstruction->GetSiPM(i)->GetName() << G4endl;
 			PENEvent->AddToSiPM(i);
 			PENEvent->CountSiPMPhoton(1);
 		}
@@ -64,6 +69,7 @@ void PENSteppingAction::UserSteppingAction(const G4Step* aStep)
 			//aStep->GetTrack()->SetTrackStatus(fKillTrackAndSecondaries);
 		}
 	}
+
 	if (processtype == fRadioactiveDecay) {
 		//G4cout << "Parent ID =" <<parentID << G4endl;
 

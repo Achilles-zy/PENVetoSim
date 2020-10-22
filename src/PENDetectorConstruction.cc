@@ -95,6 +95,7 @@ PENDetectorConstruction::PENDetectorConstruction():
 	pmtReflectivity = 0.50;
 	fPENShellLength = 10 * cm;
 	fPENShellRadius = 5 * cm;
+	fReadoutAngle = 10;
 	G4cout << "Start Construction" << G4endl;
 	DefineMat();
 	fTargetMaterial = G4Material::GetMaterial("PVT_structure");
@@ -116,6 +117,11 @@ void PENDetectorConstruction::SetConfine(G4String confine) {
 	G4RunManager::GetRunManager()->ReinitializeGeometry();
 }
 
+void PENDetectorConstruction::SetRunInfo(G4String runinfo) {
+	fRunInfo = runinfo;
+	G4RunManager::GetRunManager()->ReinitializeGeometry();
+}
+
 void PENDetectorConstruction::SetMode(G4String mode) {
 	fMode = mode;
 	G4RunManager::GetRunManager()->ReinitializeGeometry();
@@ -125,6 +131,11 @@ void PENDetectorConstruction::SetMode(G4String mode) {
 
 void PENDetectorConstruction::SetLayerNb(G4int nb) {
 	fLayerNb = nb;
+	G4RunManager::GetRunManager()->ReinitializeGeometry();
+}
+
+void PENDetectorConstruction::SetReadoutAngle(G4double angle) {
+	fReadoutAngle = angle;
 	G4RunManager::GetRunManager()->ReinitializeGeometry();
 }
 
@@ -487,7 +498,37 @@ G4VPhysicalVolume* PENDetectorConstruction::Construct()
 	else {
 		G4cout << "Error: Mode not fount!" << G4endl;
 	}
+	/*
+	G4Material* world_mat = fVacuum;
+	G4Material* env_mat = matLN2;
+	G4Material* det_mat = matEnGe;
+
+	G4double world_size = 200 * cm;
+	G4double env_size = 180 * cm;
+	G4Box* solidWorld = new G4Box("World", 0.5 * world_size, 0.5 * world_size, 0.5 * world_size);
+	G4LogicalVolume* logicWorld = new G4LogicalVolume(solidWorld, world_mat, "World");
+	G4VPhysicalVolume* physWorld =
+		new G4PVPlacement(0,                     //no rotation
+			G4ThreeVector(),       //at (0,0,0)
+			logicWorld,            //its logical volume
+			"World",               //its name
+			0,                     //its mother  volume
+			false,                 //no boolean operation
+			0,                     //copy number
+			true);        //overlaps checking
 	
+
+	G4Box* solidEnv = new G4Box("Envelope", 0.5 * env_size, 0.5 * env_size, 0.5 * env_size);
+	G4LogicalVolume* logicEnv = new G4LogicalVolume(solidEnv, env_mat, "Envelope");
+	auto physEnv = new G4PVPlacement(0, G4ThreeVector(), logicEnv, "Envelope", logicWorld, false, 0, true);
+
+	G4double ReadoutRadius = 5 * cm;
+	G4double ReadoutThickness = 1 * mm;
+	auto solidReadout = new G4Tubs("solidReadout", ReadoutRadius, ReadoutRadius + ReadoutThickness, 10*cm, 0., fReadoutAngle * degree);
+	auto logicReadout = new G4LogicalVolume(solidReadout, matSi, "logicReadout");;
+	auto physSiPM = new G4PVPlacement(0, G4ThreeVector(), logicReadout, "Readout", logicEnv, false, 0, true);
+	physSiPM0 = physSiPM;
+	*/
 }
 
 
@@ -655,7 +696,7 @@ G4VPhysicalVolume* PENDetectorConstruction::ConstructCDEX()
   G4double wireradius = 0.7 * mm;
   G4double LN2Gap = 0.5 * mm;
   G4double ShellThickness = 1 * cm;
-  G4double PENShellHeight = GeHeight1 + 4 * cm;
+  G4double PENShellHeight = GeHeight1 + GeChamfer + 4 * cm;
   G4double WireLength = PENShellHeight;
 
   //=============================================================================//
@@ -1168,7 +1209,7 @@ G4VPhysicalVolume* PENDetectorConstruction::ConstructLEGEND()
 	G4double wireradius = 0.7 * mm;
 	G4double LN2Gap = 1 * mm;
 	G4double ShellThickness = 0.3 * cm;
-	G4double PENShellHeight = GeHeight1 + 2 * LN2Gap;
+	G4double PENShellHeight = GeHeight1 + 2 * GeChamfer + 2 * LN2Gap;
 	G4double WireLength = PENShellHeight;
 
 	//=============================================================================//
@@ -1187,8 +1228,8 @@ G4VPhysicalVolume* PENDetectorConstruction::ConstructLEGEND()
 	G4ThreeVector w = G4ThreeVector(0, 0, -1);
 	G4RotationMatrix rotm1 = G4RotationMatrix(u, v, w);
 	G4ThreeVector position0 = G4ThreeVector(0., 0., 0.);
-	G4ThreeVector position1 = G4ThreeVector(0., 0., PENShellHeight / 2 + LN2Gap + ShellThickness / 2);
-	G4ThreeVector position2 = G4ThreeVector(0., 0., -PENShellHeight / 2 - LN2Gap - ShellThickness / 2);
+	G4ThreeVector position1 = G4ThreeVector(0., 0., PENShellHeight / 2 + ShellThickness / 2);
+	G4ThreeVector position2 = G4ThreeVector(0., 0., -PENShellHeight / 2 - ShellThickness / 2);
 	G4Transform3D tr0 = G4Transform3D(rotm, position0);
 	G4Transform3D tr1 = G4Transform3D(rotm, position1);
 	G4Transform3D tr2 = G4Transform3D(rotm, position2);
@@ -1202,8 +1243,8 @@ G4VPhysicalVolume* PENDetectorConstruction::ConstructLEGEND()
 	solidPENShell->Voxelize();
 	logicPENShell = new G4LogicalVolume(solidPENShell, matPEN, "logicPENShell");
 	//physPENShell = new G4PVPlacement(0, G4ThreeVector(), logicPENShell, "PENShell", logicEnv, false, 0, checkOverlaps);
-	fPENShellRadius = outerGeRadius + LN2Gap + ShellThickness + wireradius * 2 + ShellThickness + 1 * mm;
-	fPENShellLength = PENShellHeight + fPENShellRadius * 4;
+	fPENShellRadius = outerGeRadius + LN2Gap + ShellThickness;
+	fPENShellLength = PENShellHeight + 2 * ShellThickness;
 
 	auto physPENShell = new G4PVPlacement(0, G4ThreeVector(), logicPENShell, "PENShell", logicEnv, false, 0, checkOverlaps);
 
@@ -1228,9 +1269,9 @@ G4VPhysicalVolume* PENDetectorConstruction::ConstructLEGEND()
 	//                                                             //
 	//=============================================================//
 
-	G4double ReadoutRadius = outerGeRadius + LN2Gap + ShellThickness + 2 * cm;
-	G4double ReadoutThickness = 1 * cm;
-	auto solidReadout = new G4Tubs("solidReadout", ReadoutRadius, ReadoutRadius + ReadoutThickness, PENShellHeight * 2, 0., twopi);
+	G4double ReadoutRadius = outerGeRadius + LN2Gap + ShellThickness + 5 * cm;
+	G4double ReadoutThickness = 1 * mm;
+	auto solidReadout = new G4Tubs("solidReadout", ReadoutRadius, ReadoutRadius + ReadoutThickness, PENShellHeight * 5, 0., fReadoutAngle * degree);
 	auto logicReadout = new G4LogicalVolume(solidReadout, matSi, "logicReadout");;
 	auto physReadout = new G4PVPlacement(0, G4ThreeVector(), logicReadout, "Readout", logicEnv, false, 0, checkOverlaps);
 

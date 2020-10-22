@@ -9,6 +9,7 @@
 #include "G4VVisManager.hh"
 #include "G4ios.hh"
 #include "g4root.hh"
+#include "G4SystemOfUnits.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
  
@@ -33,6 +34,7 @@ PENEventAction::PENEventAction(PENRunAction* runaction)
 	Total(0),
 	ID(0),
     SiPMPhotonCount(0),
+    EscapedPhotonCount(0),
 	ifSiPM(false),
 	ifBulk(false),
     ifDetectable(false),
@@ -106,6 +108,7 @@ void PENEventAction::EndOfEventAction(const G4Event* evt)
   auto analysisManager = G4AnalysisManager::Instance();
   analysisManager->FillH1(0, edepBulk);
   analysisManager->FillH1(1, SiPMPhotonCount);
+  //G4cout << SiPMPhotonCount << G4endl;
 	if (edepBulk > 0 && SiPMPhotonCount > 0) {
 		run->CountVetoEvent();
     }
@@ -126,8 +129,17 @@ void PENEventAction::EndOfEventAction(const G4Event* evt)
         run->CountVetoPossibleEvent();
     }
 
+    if (edepBulk > 2200 * keV && edepBulk < 2400 * keV) {
+        run->CountROIEvent();
 
+        if (SiPMPhotonCount > 0) {
+            run->CountROIVetoEvent();
+        }
 
+        if (ifDetectable == true) {
+            run->CountROIVetoPossibleEvent();
+        }
+    }
 
     G4int evtID = evt->GetEventID();
 

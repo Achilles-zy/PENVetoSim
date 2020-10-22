@@ -16,7 +16,8 @@ PENPrimaryGeneratorAction::PENPrimaryGeneratorAction(PENDetectorConstruction* de
 	G4VUserPrimaryGeneratorAction(),
 	PrimaryE(0),
 	PrimaryName(""),
-	SrcType("Wire")
+	SrcType("Wire"),
+	LEGENDSrcPos("Side")
 {
 	
     fPENGPS = new G4GeneralParticleSource();
@@ -147,6 +148,33 @@ void PENPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
 		else {
 			G4cout << "Error: Src type not found!" << G4endl;
+		}
+	}
+	else if (mode == "LEGEND") {
+		if (LEGENDSrcPos == "Side") {
+			G4double Radius = fDetCons->GetPENShellRadius();
+			G4double Length = fDetCons->GetPENShellLength();
+			//fPENGPS->SetParticleDefinition(particleTable->FindParticle(particleName));
+			fPENGPS->GetCurrentSource()->GetEneDist()->SetEnergyDisType("Mono");
+			//fPENGPS->GetCurrentSource()->GetEneDist()->SetMonoEnergy(particleEnergy);
+			fPENGPS->GetCurrentSource()->GetAngDist()->SetAngDistType("iso");
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetPosDisType("Surface");
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetPosDisShape("Cylinder");
+			//fPENGPS->GetCurrentSource()->GetPosDist()->SetCentreCoords(WirePos);
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetRadius(Radius);
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetHalfZ(Length / 2);
+		}
+		else if (LEGENDSrcPos == "Top") {
+			G4double Radius = fDetCons->GetPENShellRadius();
+			G4double Length = fDetCons->GetPENShellLength();
+			//fPENGPS->SetParticleDefinition(particleTable->FindParticle(particleName));
+			fPENGPS->GetCurrentSource()->GetEneDist()->SetEnergyDisType("Mono");
+			//fPENGPS->GetCurrentSource()->GetEneDist()->SetMonoEnergy(particleEnergy);
+			fPENGPS->GetCurrentSource()->GetAngDist()->SetAngDistType("iso");
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetPosDisType("Plane");
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetPosDisShape("Circle");
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetCentreCoords(G4ThreeVector(0, 0, Length / 2));
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetRadius(Radius);
 		}
 	}
 

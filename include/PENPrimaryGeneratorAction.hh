@@ -29,10 +29,15 @@ public:
         SrcType = type;
     }
 
+    void SetLEGENDSrcPos(G4String pos) {
+        LEGENDSrcPos = pos;
+    }
+
 private:
     G4double PrimaryE;
     G4String PrimaryName;
     G4String SrcType;
+    G4String LEGENDSrcPos;
 
     G4GeneralParticleSource* fPENGPS;
     PENDetectorConstruction* fDetCons;

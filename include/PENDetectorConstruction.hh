@@ -40,8 +40,11 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
         void SetABS(G4double);
         void SetWireType(G4String);
         void SetConfine(G4String);
+        void SetRunInfo(G4String);
         void SetMode(G4String);
         void SetLayerNb(G4int);
+        void SetReadoutAngle(G4double);
+
         //void SetLayerNbS(G4String);
 
         G4ThreeVector GetWirePos() {
@@ -64,6 +67,10 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
             return fConfine;
         }
 
+        G4String GetRunInfo() {
+            return fRunInfo;
+        }
+
         G4String GetMode() {
             return fMode;
         }
@@ -78,6 +85,10 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
 
         G4double GetPENShellRadius() {
             return fPENShellRadius;
+        }
+
+        G4double GetReadoutAngle() {
+            return fReadoutAngle;
         }
 
     private:
@@ -100,22 +111,7 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
         G4VPhysicalVolume* physSiPM13;
         G4VPhysicalVolume* physSiPM14;
         G4VPhysicalVolume* physSiPM15;
-		//G4VPhysicalVolume* SiPM_0;
-		//G4VPhysicalVolume* SiPM_1;
-		//G4VPhysicalVolume* SiPM_2;
-		//G4VPhysicalVolume* SiPM_3;
-		//G4VPhysicalVolume* SiPM_4;
-  //      G4VPhysicalVolume* SiPM_5;
-		//G4VPhysicalVolume* SiPM_6;
-		//G4VPhysicalVolume* SiPM_7;
-		//G4VPhysicalVolume* SiPM_8;
-		//G4VPhysicalVolume* SiPM_9;
-		//G4VPhysicalVolume* SiPM_10;
-		//G4VPhysicalVolume* SiPM_11;
-  //      G4VPhysicalVolume* SiPM_12;
-  //      G4VPhysicalVolume* SiPM_13;
-  //      G4VPhysicalVolume* SiPM_14;
-  //      G4VPhysicalVolume* SiPM_15;
+
         G4VPhysicalVolume* physWire;
         G4VPhysicalVolume* physPENShell;
         G4LogicalVolume* logicPENShell;
@@ -172,6 +168,7 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
         G4String fABSFile;
         G4String fType;
         G4String fConfine;
+        G4String fRunInfo;
         G4String fMode;
         G4int fLayerNb;
         G4ThreeVector fWirePos;
@@ -180,6 +177,7 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
         G4double fWireLength;
         G4double fPENShellRadius;
         G4double fPENShellLength;
+        G4double fReadoutAngle;
         PENDetectorMessenger* fDetectorMessenger;
         
 };

@@ -27,7 +27,9 @@ PENDetectorMessenger::PENDetectorMessenger(PENDetectorConstruction* Det)
 	fDetDir(0),
 	cmdSetWireType(0),
 	cmdSetConfine(0),
-	cmdSetLayerNb(0)
+	cmdSetRunInfo(0),
+	cmdSetLayerNb(0),
+	cmdSetReadoutAngle(0)
 {
 	fDetDir = new G4UIdirectory("/PEN/det/set");
 	fDetDir->SetGuidance("Set detector construction parameters");
@@ -47,6 +49,12 @@ PENDetectorMessenger::PENDetectorMessenger(PENDetectorConstruction* Det)
 	cmdSetConfine->AvailableForStates(G4State_PreInit, G4State_Idle);
 	cmdSetConfine->SetToBeBroadcasted(false);
 
+	cmdSetRunInfo = new G4UIcmdWithAString("/PEN/det/set/runinfo", this);
+	cmdSetRunInfo->SetGuidance("Add run info");
+	cmdSetRunInfo->SetParameterName("RunInfo", false);
+	cmdSetRunInfo->AvailableForStates(G4State_PreInit, G4State_Idle);
+	cmdSetRunInfo->SetToBeBroadcasted(false);
+
 	cmdSetMode = new G4UIcmdWithAString("/PEN/sim/set/mode", this);
 	cmdSetMode->SetGuidance("Select simulation mode.");
 	cmdSetMode->SetParameterName("SimulationMode", false);
@@ -59,6 +67,12 @@ PENDetectorMessenger::PENDetectorMessenger(PENDetectorConstruction* Det)
 	cmdSetLayerNb->AvailableForStates(G4State_PreInit, G4State_Idle);
 	cmdSetLayerNb->SetToBeBroadcasted(false);
 
+	cmdSetReadoutAngle = new G4UIcmdWithADouble("/LEGEND/readout/angle", this);
+	cmdSetReadoutAngle->SetGuidance("Set readout angle");
+	cmdSetReadoutAngle->SetParameterName("Angle", false);
+	cmdSetReadoutAngle->AvailableForStates(G4State_PreInit, G4State_Idle);
+	cmdSetReadoutAngle->SetToBeBroadcasted(false);
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -70,6 +84,7 @@ PENDetectorMessenger::~PENDetectorMessenger()
 	delete cmdSetWireType;
 	delete cmdSetConfine;
 	delete cmdSetLayerNb;
+	delete cmdSetRunInfo;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -78,6 +93,10 @@ void PENDetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
 {
 	if (command == cmdSetWireType) {
 		fDetCons->SetWireType(newValue);
+	}
+
+	if (command == cmdSetRunInfo) {
+		fDetCons->SetRunInfo(newValue);
 	}
 
 	if (command == cmdSetConfine) {
@@ -90,6 +109,10 @@ void PENDetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
 
 	if (command == cmdSetLayerNb) {
 		fDetCons->SetLayerNb(cmdSetLayerNb->GetNewIntValue(newValue));
+	}
+
+	if (command == cmdSetReadoutAngle) {
+		fDetCons->SetReadoutAngle(cmdSetReadoutAngle->GetNewDoubleValue(newValue));
 	}
 
 }

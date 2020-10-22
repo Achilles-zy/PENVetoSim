@@ -24,7 +24,8 @@ PENPrimaryGeneratorMessenger::PENPrimaryGeneratorMessenger(PENPrimaryGeneratorAc
   : G4UImessenger(),
     fAction(Gun),
     fSrcDir(0),
-    cmdSetSrcType(0)
+    cmdSetSrcType(0),
+    cmdLENGENDSetSrcPos(0)
 {
   fSrcDir = new G4UIdirectory("/PEN/src/");
   fSrcDir->SetGuidance("PrimaryGenerator control");
@@ -35,6 +36,11 @@ PENPrimaryGeneratorMessenger::PENPrimaryGeneratorMessenger(PENPrimaryGeneratorAc
   cmdSetSrcType->SetDefaultValue("Wire");
   cmdSetSrcType->AvailableForStates(G4State_PreInit, G4State_Idle);
   
+  cmdLENGENDSetSrcPos = new G4UIcmdWithAString("/LEGEND/src/pos", this);
+  cmdLENGENDSetSrcPos->SetGuidance("Choose the position of source");
+  cmdLENGENDSetSrcPos->SetParameterName("SrcPos", true);
+  cmdLENGENDSetSrcPos->SetDefaultValue("Side");
+  cmdLENGENDSetSrcPos->AvailableForStates(G4State_PreInit, G4State_Idle);
   /*
   fSourcePositionX = new G4UIcmdWithADoubleAndUnit("/PEN/gun/sourcePositionX",this);
   fSourcePositionX->SetGuidance("Set Source x position");
@@ -61,6 +67,7 @@ PENPrimaryGeneratorMessenger::PENPrimaryGeneratorMessenger(PENPrimaryGeneratorAc
 PENPrimaryGeneratorMessenger::~PENPrimaryGeneratorMessenger()
 {
   delete cmdSetSrcType;
+  delete cmdLENGENDSetSrcPos;
   delete fSrcDir;
   //delete fSourceEnergy;
   //delete fSourcePositionX;
@@ -75,6 +82,10 @@ void PENPrimaryGeneratorMessenger::SetNewValue(G4UIcommand* command, G4String ne
 {
   if(command == cmdSetSrcType) {
   	fAction->SetSrcType(newValue);
+  }
+
+  if (command == cmdLENGENDSetSrcPos) {
+      fAction->SetLEGENDSrcPos(newValue);
   }
 
   //if(command == fSourceEnergy){
