@@ -23,10 +23,12 @@ PENPrimaryGeneratorAction::PENPrimaryGeneratorAction(PENDetectorConstruction* de
     fPENGPS = new G4GeneralParticleSource();
 	fPrimaryMessenger = new PENPrimaryGeneratorMessenger(this);
 	fDetCons = det;
-	/*
-    G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-    G4String particleName = "e-";
+	G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+	G4String particleName = "e-";
 	G4double particleEnergy = 0 * MeV;
+	fPENGPS->SetParticleDefinition(particleTable->FindParticle(particleName));
+	/*
+
 	
 	if (SrcType == "Wire") {
 		G4double Radius = fDetCons->GetWireRadius();
@@ -175,6 +177,20 @@ void PENPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 			fPENGPS->GetCurrentSource()->GetPosDist()->SetPosDisShape("Circle");
 			fPENGPS->GetCurrentSource()->GetPosDist()->SetCentreCoords(G4ThreeVector(0, 0, Length / 2));
 			fPENGPS->GetCurrentSource()->GetPosDist()->SetRadius(Radius);
+		}
+		else if (LEGENDSrcPos == "Shroud") {
+			G4double Radius = fDetCons->GetPENShellRadius();
+			G4double Length = fDetCons->GetPENShellLength();
+			//fPENGPS->SetParticleDefinition(particleTable->FindParticle(particleName));
+			fPENGPS->GetCurrentSource()->GetEneDist()->SetEnergyDisType("Mono");
+			//fPENGPS->GetCurrentSource()->GetEneDist()->SetMonoEnergy(particleEnergy);
+			fPENGPS->GetCurrentSource()->GetAngDist()->SetAngDistType("iso");
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetPosDisType("Volume");
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetPosDisShape("Cylinder");
+			//fPENGPS->GetCurrentSource()->GetPosDist()->SetCentreCoords(G4ThreeVector(0, 0, 0));
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetRadius(Radius);
+			fPENGPS->GetCurrentSource()->GetPosDist()->SetHalfZ(Length / 2);
+			fPENGPS->GetCurrentSource()->GetPosDist()->ConfineSourceToVolume("PENShell");
 		}
 	}
 

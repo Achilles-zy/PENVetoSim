@@ -30,6 +30,7 @@ class PENPrimaryGeneratorMessenger: public G4UImessenger
 
     G4UIcmdWithAString* cmdSetSrcType;
     G4UIcmdWithAString* cmdLENGENDSetSrcPos;
+
     //G4UIcmdWithADoubleAndUnit* fSourceEnergy;
     //G4UIcmdWithADoubleAndUnit* fSourcePositionX;
     //G4UIcmdWithADoubleAndUnit* fSourcePositionY;

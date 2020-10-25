@@ -82,6 +82,7 @@ private:
 	G4String filename;
 	G4String txtname;
 	G4bool ifRefresh;
+	G4int runID;
 };
 
 #endif

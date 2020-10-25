@@ -82,7 +82,7 @@ PENDetectorConstruction::PENDetectorConstruction():
 	MPT_PEN = new G4MaterialPropertiesTable();
 	AbsorptionLength = 1.5;//value at 400 nm
 	fRES = 1.0;
-	fLY = 3000. / MeV;
+	fLY = 3500. / MeV;
 	fABSFile = "PEN_ABS";
 	fConfine = "Wire";
 	fType = "A1";
@@ -95,12 +95,11 @@ PENDetectorConstruction::PENDetectorConstruction():
 	pmtReflectivity = 0.50;
 	fPENShellLength = 10 * cm;
 	fPENShellRadius = 5 * cm;
-	fReadoutAngle = 10;
+	fReadoutAngle = 360;
+	fPENPropertiesID = 1;
+	absFactor = 1;
 	G4cout << "Start Construction" << G4endl;
-	DefineMat();
-	fTargetMaterial = G4Material::GetMaterial("PVT_structure");
-	fGlassMaterialPMT = G4Material::GetMaterial("BorosilicateGlass");
-	SetABS(AbsorptionLength);
+
 }
 
 PENDetectorConstruction::~PENDetectorConstruction()
@@ -127,10 +126,13 @@ void PENDetectorConstruction::SetMode(G4String mode) {
 	G4RunManager::GetRunManager()->ReinitializeGeometry();
 }
 
-
-
 void PENDetectorConstruction::SetLayerNb(G4int nb) {
 	fLayerNb = nb;
+	G4RunManager::GetRunManager()->ReinitializeGeometry();
+}
+
+void PENDetectorConstruction::SetPENPropertiesID(G4int nb) {
+	fPENPropertiesID = nb;
 	G4RunManager::GetRunManager()->ReinitializeGeometry();
 }
 
@@ -186,6 +188,18 @@ void PENDetectorConstruction::DefineMat()
 	G4double RINDEX_PEN[102] = { 0 };
 
 	G4int absEntries = 0;
+	if (fPENPropertiesID == 0) {
+		fLY = 3000. / MeV;
+		absFactor = 1;
+	}
+	else if (fPENPropertiesID == 1) {
+		fLY = 3500. / MeV;
+		absFactor = 2.58;
+	}
+	else if (fPENPropertiesID == 2) {
+		fLY = 6000. / MeV;
+		absFactor = 6.44;
+	}
 	ifstream ReadAbs;
 
 	G4String absFile = "../input_files/" + fABSFile + ".csv";
@@ -199,7 +213,7 @@ void PENDetectorConstruction::DefineMat()
 				break;
 			}
 			wlPhotonEnergy[absEntries] = (1240. / wavelength) * eV;
-			ABSORPTION_PEN[absEntries] = (varAbsorLength)*mm;
+			ABSORPTION_PEN[absEntries] = (varAbsorLength * absFactor) * mm;
 			RINDEX_PEN[absEntries] = rindex;
 			absEntries++;
 		}
@@ -264,6 +278,9 @@ void PENDetectorConstruction::DefineMat()
 	MPT_PEN->AddConstProperty("SLOWTIMECONSTANT", 24.336 * ns);
 	MPT_PEN->AddConstProperty("YIELDRATIO", 1.);
 
+	G4cout << "PEN Properties:" << G4endl;
+	G4cout << "AbsFactor =" << absFactor << G4endl;
+	G4cout << "LY =" << fLY << G4endl;
 	matPEN->SetMaterialPropertiesTable(MPT_PEN);
 	//pvt_structure->SetMaterialPropertiesTable(MPT_PEN);
 
@@ -489,6 +506,10 @@ void PENDetectorConstruction::SetABS(G4double value) {
 
 G4VPhysicalVolume* PENDetectorConstruction::Construct()
 {
+	DefineMat();
+	fTargetMaterial = G4Material::GetMaterial("PVT_structure");
+	fGlassMaterialPMT = G4Material::GetMaterial("BorosilicateGlass");
+	SetABS(AbsorptionLength);
 	if (fMode == "CDEX") {
 		return ConstructCDEX();
 	}
@@ -530,7 +551,6 @@ G4VPhysicalVolume* PENDetectorConstruction::Construct()
 	physSiPM0 = physSiPM;
 	*/
 }
-
 
 G4VPhysicalVolume* PENDetectorConstruction::ConstructCDEX()
 {
@@ -1075,8 +1095,6 @@ G4VPhysicalVolume* PENDetectorConstruction::ConstructCDEX()
 
   return physWorld;
 }
-
-
 
 G4VPhysicalVolume* PENDetectorConstruction::ConstructLEGEND()
 {

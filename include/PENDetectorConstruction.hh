@@ -43,6 +43,7 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
         void SetRunInfo(G4String);
         void SetMode(G4String);
         void SetLayerNb(G4int);
+        void SetPENPropertiesID(G4int);
         void SetReadoutAngle(G4double);
 
         //void SetLayerNbS(G4String);
@@ -77,6 +78,10 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
 
         G4int GetLayerNb() {
             return fLayerNb;
+        }
+
+        G4int GetPENPropertiesID() {
+            return fPENPropertiesID;
         }
 
         G4double GetPENShellLength() {
@@ -171,6 +176,7 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
         G4String fRunInfo;
         G4String fMode;
         G4int fLayerNb;
+        G4int fPENPropertiesID;
         G4ThreeVector fWirePos;
         G4double fWireCentDist;
         G4double fWireRadius;
@@ -178,6 +184,7 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
         G4double fPENShellRadius;
         G4double fPENShellLength;
         G4double fReadoutAngle;
+        G4double absFactor;
         PENDetectorMessenger* fDetectorMessenger;
         
 };

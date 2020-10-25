@@ -38,6 +38,7 @@ private:
     G4UIcmdWithAString* cmdSetMode;
     G4UIcmdWithAnInteger* cmdSetLayerNb;
     G4UIcmdWithADouble* cmdSetReadoutAngle;
+    G4UIcmdWithAnInteger* cmdSetPENPropertiesID;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

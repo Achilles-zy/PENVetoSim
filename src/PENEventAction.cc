@@ -42,25 +42,7 @@ PENEventAction::PENEventAction(PENRunAction* runaction)
     //ResultFile("Distribution_Results_NTuple.root","RECREATE"),
     //Distribution_Results("Distribution_Results","Distribution_Results")
 {
-  /*
-  Distribution_Results.Branch("SiPM_0",&SiPM_0, "SiPM_0/I");
-  Distribution_Results.Branch("SiPM_1",&SiPM_1, "SiPM_1/I");
-  Distribution_Results.Branch("SiPM_2",&SiPM_2, "SiPM_2/I");
-  Distribution_Results.Branch("SiPM_3",&SiPM_3, "SiPM_3/I");
-  Distribution_Results.Branch("SiPM_4",&SiPM_4, "SiPM_4/I");
-  Distribution_Results.Branch("SiPM_5",&SiPM_5, "SiPM_5/I");
-  Distribution_Results.Branch("SiPM_6",&SiPM_6, "SiPM_6/I");
-  Distribution_Results.Branch("SiPM_7",&SiPM_7, "SiPM_7/I");
-  Distribution_Results.Branch("SiPM_8",&SiPM_8, "SiPM_8/I");
-  Distribution_Results.Branch("SiPM_9",&SiPM_9, "SiPM_9/I");
-  Distribution_Results.Branch("SiPM_10",&SiPM_10, "SiPM_10/I");
-  Distribution_Results.Branch("SiPM_11",&SiPM_11, "SiPM_11/I");
-  Distribution_Results.Branch("SiPM_12",&SiPM_12, "SiPM_12/I");
-  Distribution_Results.Branch("SiPM_13",&SiPM_13, "SiPM_13/I");
-  Distribution_Results.Branch("SiPM_14",&SiPM_14, "SiPM_14/I");
-  Distribution_Results.Branch("SiPM_15",&SiPM_15, "SiPM_15/I");
-  Distribution_Results.Branch("Total",&Total, "Total/I");
-  */
+
 }
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
  
@@ -108,6 +90,9 @@ void PENEventAction::EndOfEventAction(const G4Event* evt)
   auto analysisManager = G4AnalysisManager::Instance();
   analysisManager->FillH1(0, edepBulk);
   analysisManager->FillH1(1, SiPMPhotonCount);
+  analysisManager->FillH1(2, SiPMPhotonCount);
+  analysisManager->FillNtupleIColumn(1, 0, SiPMPhotonCount);
+  analysisManager->AddNtupleRow(1);
   //G4cout << SiPMPhotonCount << G4endl;
 	if (edepBulk > 0 && SiPMPhotonCount > 0) {
 		run->CountVetoEvent();
@@ -146,27 +131,6 @@ void PENEventAction::EndOfEventAction(const G4Event* evt)
     if (evtID % 5000 == 0) {
         G4cout << evtID << G4endl;
     }
-  //G4cout<<TE<<G4endl;
-
-  // analysisManager -> FillH1(0, Energy_0);
-  // analysisManager -> FillH1(1, SiPM_0);
-  // analysisManager -> FillH1(2, SiPM_1);
-  // analysisManager -> FillH1(3, SiPM_2);
-  // analysisManager -> FillH1(4, SiPM_3);
-  // analysisManager -> FillH1(5, SiPM_4);
-  // analysisManager -> FillH1(6, SiPM_5);
-  // analysisManager -> FillH1(7, SiPM_6);
-  // analysisManager -> FillH1(8, SiPM_7);
-  // analysisManager -> FillH1(9, SiPM_8);
-  // analysisManager -> FillH1(10, SiPM_9);
-  // analysisManager -> FillH1(11, SiPM_10);
-  // analysisManager -> FillH1(12, SiPM_11);
-  // analysisManager -> FillH1(13, SiPM_12);
-  // analysisManager -> FillH1(14, SiPM_13);
-  // analysisManager -> FillH1(15, SiPM_14);
-  // analysisManager -> FillH1(16, SiPM_15);
-  // analysisManager -> FillH1(17, Total);
-  //Distribution_Results.Fill();
 
   ID++;
 

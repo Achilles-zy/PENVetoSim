@@ -39,6 +39,8 @@ private:
     G4String SrcType;
     G4String LEGENDSrcPos;
 
+
+
     G4GeneralParticleSource* fPENGPS;
     PENDetectorConstruction* fDetCons;
     PENPrimaryGeneratorMessenger* fPrimaryMessenger;

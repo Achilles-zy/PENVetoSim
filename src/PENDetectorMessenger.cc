@@ -29,7 +29,8 @@ PENDetectorMessenger::PENDetectorMessenger(PENDetectorConstruction* Det)
 	cmdSetConfine(0),
 	cmdSetRunInfo(0),
 	cmdSetLayerNb(0),
-	cmdSetReadoutAngle(0)
+	cmdSetReadoutAngle(0),
+	cmdSetPENPropertiesID(0)
 {
 	fDetDir = new G4UIdirectory("/PEN/det/set");
 	fDetDir->SetGuidance("Set detector construction parameters");
@@ -73,6 +74,12 @@ PENDetectorMessenger::PENDetectorMessenger(PENDetectorConstruction* Det)
 	cmdSetReadoutAngle->AvailableForStates(G4State_PreInit, G4State_Idle);
 	cmdSetReadoutAngle->SetToBeBroadcasted(false);
 
+	cmdSetPENPropertiesID = new G4UIcmdWithAnInteger("/PEN/mat/set/PENpropertiesID", this);
+	cmdSetPENPropertiesID->SetGuidance("Set PEN properties ID");
+	cmdSetPENPropertiesID->SetParameterName("ID", false);
+	cmdSetPENPropertiesID->AvailableForStates(G4State_PreInit, G4State_Idle);
+	cmdSetPENPropertiesID->SetToBeBroadcasted(false);
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -85,6 +92,7 @@ PENDetectorMessenger::~PENDetectorMessenger()
 	delete cmdSetConfine;
 	delete cmdSetLayerNb;
 	delete cmdSetRunInfo;
+	delete cmdSetPENPropertiesID;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -115,4 +123,7 @@ void PENDetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
 		fDetCons->SetReadoutAngle(cmdSetReadoutAngle->GetNewDoubleValue(newValue));
 	}
 
+	if (command == cmdSetPENPropertiesID) {
+		fDetCons->SetPENPropertiesID(cmdSetPENPropertiesID->GetNewIntValue(newValue));
+	}
 }

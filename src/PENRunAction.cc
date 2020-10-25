@@ -19,24 +19,34 @@ PENRunAction::PENRunAction(PENPrimaryGeneratorAction* gen, PENDetectorConstructi
 	ROIEventCount(0),
 	ROIVetoEventCount(0),
 	ROIVetoPossibleEvtCount(0),
-	ifRefresh(false)
+	ifRefresh(false),
+	runID(0)
 {
   fPrimaryMessenger = new PENRunMessenger(this);
   auto analysisManager = G4AnalysisManager::Instance();
+  analysisManager->SetNtupleMerging(true);
   analysisManager->SetVerboseLevel(1);
   analysisManager->CreateH1("edepBulk", "Edep in Bulk", 200, 0 * keV, 20 * keV);
-  analysisManager->CreateH1("PhotonCount", "Photon Count", 200, 0, 200);
+  analysisManager->CreateH1("PhotonCount", "Photon Count", 1000, 0, 3000);
+  analysisManager->CreateH1("PhotonCount2", "Photon Count", 100, 0, 100);
 
-  analysisManager->CreateNtuple("Data", "EventCount");
-  analysisManager->CreateNtupleIColumn("VetoCount");
-  analysisManager->CreateNtupleIColumn("SiPMCount");
-  analysisManager->CreateNtupleIColumn("BulkCount");
-  analysisManager->CreateNtupleIColumn("DetectableCount");
-  analysisManager->CreateNtupleIColumn("VetoPossibleCount");
-  analysisManager->CreateNtupleIColumn("ROIEventCount");
-  analysisManager->CreateNtupleIColumn("ROIVetoEventCount");
-  analysisManager->CreateNtupleIColumn("ROIVetoPossibleEvtCount");
-  analysisManager->FinishNtuple();
+
+  analysisManager->CreateNtuple("RunRes", "EventCount");
+  analysisManager->CreateNtupleIColumn(0, "VetoCount");
+  analysisManager->CreateNtupleIColumn(0, "SiPMCount");
+  analysisManager->CreateNtupleIColumn(0, "BulkCount");
+  analysisManager->CreateNtupleIColumn(0, "DetectableCount");
+  analysisManager->CreateNtupleIColumn(0, "VetoPossibleCount");
+  analysisManager->CreateNtupleIColumn(0, "ROIEventCount");
+  analysisManager->CreateNtupleIColumn(0, "ROIVetoEventCount");
+  analysisManager->CreateNtupleIColumn(0, "ROIVetoPossibleEvtCount");
+  analysisManager->FinishNtuple(0);
+
+  analysisManager->CreateNtuple("PhotonCount", "PhotonCoutnt");
+  analysisManager->CreateNtupleIColumn(1, "SiPMPhotonCount");
+  analysisManager->FinishNtuple(1);
+  //analysisManager->SetFirstNtupleId(0);
+
   G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
   accumulableManager->RegisterAccumulable(SiPMEventCount);
   accumulableManager->RegisterAccumulable(VetoEventCount);
@@ -57,9 +67,7 @@ PENRunAction::PENRunAction(PENPrimaryGeneratorAction* gen, PENDetectorConstructi
  
 PENRunAction::~PENRunAction()
 {
-  
-
-  // delete G4AnalysisManager::Instance();
+  delete G4AnalysisManager::Instance();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -67,6 +75,7 @@ PENRunAction::~PENRunAction()
 void PENRunAction::BeginOfRunAction(const G4Run* aRun)
 {
   auto analysisManager = G4AnalysisManager::Instance();
+
   G4int RunID = aRun->GetRunID();
   G4String fileName;
   if (fDetCons->GetMode() == "CDEX") {
@@ -75,7 +84,7 @@ void PENRunAction::BeginOfRunAction(const G4Run* aRun)
 	  txtname = fDetCons->GetWireType() + "_" + fDetCons->GetConfine();
   }
   else if (fDetCons->GetMode() == "LEGEND") {
-	  fileName = "LEGEND_" + fDetCons->GetRunInfo() + "_" + std::to_string(RunID);
+	  fileName = "LEGEND_" + fDetCons->GetRunInfo() + "_" + std::to_string((int)fDetCons->GetReadoutAngle());
 	  filename = fileName;
 	  txtname = "LEGEND_" + fDetCons->GetRunInfo();
   }
@@ -86,7 +95,7 @@ void PENRunAction::BeginOfRunAction(const G4Run* aRun)
   G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
   accumulableManager->Reset();
   if (G4RunManager::GetRunManager()->GetRunManagerType() == 1) {
-	  G4cout << "Run " << aRun->GetRunID() << " started." << G4endl;
+	  G4cout << "Run started." << G4endl;
   }
 
 }
@@ -99,19 +108,19 @@ void PENRunAction::EndOfRunAction(const G4Run* aRun)
   accumulableManager->Merge();
 
   auto analysisManager = G4AnalysisManager::Instance();
-  analysisManager->FillNtupleIColumn(0, VetoEventCount.GetValue());
-  analysisManager->FillNtupleIColumn(1, SiPMEventCount.GetValue());
-  analysisManager->FillNtupleIColumn(2, BulkEventCount.GetValue());
-  analysisManager->FillNtupleIColumn(3, DetectableEventCount.GetValue());
-  analysisManager->FillNtupleIColumn(4, VetoPossibleEvtCount.GetValue());
-  analysisManager->FillNtupleIColumn(5, ROIEventCount.GetValue());
-  analysisManager->FillNtupleIColumn(6, ROIVetoEventCount.GetValue());
-  analysisManager->FillNtupleIColumn(7, ROIVetoPossibleEvtCount.GetValue());
-  analysisManager->AddNtupleRow();
-  // analysisManager -> SetH1Plotting(0,true);
-  // analysisManager -> SetH1Plotting(1,true);
-  analysisManager->Write();
-  analysisManager->CloseFile();
+  if (G4RunManager::GetRunManager()->GetRunManagerType() != 1) {
+	  analysisManager->FillNtupleIColumn(0, 0, VetoEventCount.GetValue());
+	  analysisManager->FillNtupleIColumn(0, 1, SiPMEventCount.GetValue());
+	  analysisManager->FillNtupleIColumn(0, 2, BulkEventCount.GetValue());
+	  analysisManager->FillNtupleIColumn(0, 3, DetectableEventCount.GetValue());
+	  analysisManager->FillNtupleIColumn(0, 4, VetoPossibleEvtCount.GetValue());
+	  analysisManager->FillNtupleIColumn(0, 5, ROIEventCount.GetValue());
+	  analysisManager->FillNtupleIColumn(0, 6, ROIVetoEventCount.GetValue());
+	  analysisManager->FillNtupleIColumn(0, 7, ROIVetoPossibleEvtCount.GetValue());
+	  analysisManager->AddNtupleRow(0);
+  }
+
+
   if (fDetCons->GetMode() == "CDEX") {
 	  CDEXOutput(aRun);
   }
@@ -122,6 +131,8 @@ void PENRunAction::EndOfRunAction(const G4Run* aRun)
 	  G4cout << "ERRRO! Mode does not exsist, nothing to output!" << G4endl;
   }
   ifRefresh = false;
+  analysisManager->Write();
+  analysisManager->CloseFile();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -177,37 +188,37 @@ void PENRunAction::CDEXOutput(const G4Run* aRun) {
 
 		if (aRun->GetRunID() == 0) {
 			output
-				<< std::setw(10) << "Run ID" << '\t'
-				<< std::setw(40) << "Number of Event" << '\t'
-				<< std::setw(40) << "Primary Particle" << '\t'
-				<< std::setw(40) << "Primary Energy(MeV)" << '\t'
-				<< std::setw(40) << "SiPMEventCount" << '\t'
-				<< std::setw(40) << "VetoEventCount" << '\t'
-				<< std::setw(40) << "BulkEventCount" << '\t'
-				<< std::setw(40) << "DetectableEventCount" << '\t'
-				<< std::setw(40) << "VetoPossibleEventCount" << '\t'
-				<< std::setw(40) << "VetoEfficiency" << '\t'
-				<< std::setw(40) << "ROIEventCount" << '\t'
-				<< std::setw(40) << "ROIVetoEventCount" << '\t'
-				<< std::setw(40) << "ROIVetoPossibleEventCount" << '\t'
-				<< std::setw(40) << "ROIVetoEfficiency" << '\t' << G4endl;
+				<< std::setw(10) << std::left << "Run ID" << '\t'
+				<< std::setw(40) << std::left << "Number of Event" << '\t'
+				<< std::setw(40) << std::left << "Primary Particle" << '\t'
+				<< std::setw(40) << std::left << "Primary Energy(MeV)" << '\t'
+				<< std::setw(40) << std::left << "SiPMEventCount" << '\t'
+				<< std::setw(40) << std::left << "VetoEventCount" << '\t'
+				<< std::setw(40) << std::left << "BulkEventCount" << '\t'
+				<< std::setw(40) << std::left << "DetectableEventCount" << '\t'
+				<< std::setw(40) << std::left << "VetoPossibleEventCount" << '\t'
+				<< std::setw(40) << std::left << "VetoEfficiency" << '\t'
+				<< std::setw(40) << std::left << "ROIEventCount" << '\t'
+				<< std::setw(40) << std::left << "ROIVetoEventCount" << '\t'
+				<< std::setw(40) << std::left << "ROIVetoPossibleEventCount" << '\t'
+				<< std::setw(40) << std::left << "ROIVetoEfficiency" << '\t' << G4endl;
 		}
 
 		output
-			<< std::setw(10) << aRun->GetRunID() << '\t'
-			<< std::setw(40) << aRun->GetNumberOfEvent() << '\t'
-			<< std::setw(40) << fPrimaryGenerator->GetPrimaryName() << '\t'
-			<< std::setw(40) << std::setiosflags(std::ios::fixed) << std::setprecision(2) << fPrimaryGenerator->GetPrimaryE() << '\t'
-			<< std::setw(40) << SiPMEventCount.GetValue() << '\t'
-			<< std::setw(40) << VetoEventCount.GetValue() << '\t'
-			<< std::setw(40) << BulkEventCount.GetValue() << '\t'
-			<< std::setw(40) << DetectableEventCount.GetValue() << '\t'
-			<< std::setw(40) << VetoPossibleEvtCount.GetValue() << '\t'
-			<< std::setw(40) << eff << '\t'
-			<< std::setw(40) << ROIEventCount.GetValue() << '\t'
-			<< std::setw(40) << ROIVetoEventCount.GetValue() << '\t'
-			<< std::setw(40) << ROIVetoPossibleEvtCount.GetValue() << '\t'
-			<< std::setw(40) << ROIeff << G4endl;
+			<< std::setw(10) << std::left << aRun->GetRunID() << '\t'
+			<< std::setw(40) << std::left << aRun->GetNumberOfEvent() << '\t'
+			<< std::setw(40) << std::left << fPrimaryGenerator->GetPrimaryName() << '\t'
+			<< std::setw(40) << std::left << std::setiosflags(std::ios::fixed) << std::setprecision(2) << fPrimaryGenerator->GetPrimaryE() << '\t'
+			<< std::setw(40) << std::left << SiPMEventCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << VetoEventCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << BulkEventCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << DetectableEventCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << VetoPossibleEvtCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << eff << '\t'
+			<< std::setw(40) << std::left << ROIEventCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << ROIVetoEventCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << ROIVetoPossibleEvtCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << ROIeff << G4endl;
 		output.close();
 		//std::DecimalFormat df1 = new DecimalFormat("0.0");
 	}
@@ -229,12 +240,13 @@ void PENRunAction::LEGENDOutput(const G4Run* aRun) {
 		G4cout << "ROIEventCount =" << ROIEventCount.GetValue() << G4endl;
 		G4cout << "ROIVetoEventCount =" << ROIVetoEventCount.GetValue() << G4endl;
 		G4cout << "ROIVetoPossibleEventCount =" << ROIVetoPossibleEvtCount.GetValue() << G4endl;
+		G4cout << "PropertiesID =" << fDetCons->GetPENPropertiesID() << G4endl;
 		G4cout << G4endl;
 		G4cout << G4endl;
 		G4cout << "===============================================================" << G4endl;
 
 		std::ofstream output;
-		if (ifRefresh==true) {
+		if (ifRefresh == true) {
 			output.open(txtname + ".txt", std::ios::ate);
 			output
 				<< "Run Info:\t" << fDetCons->GetRunInfo() << G4endl;
@@ -263,39 +275,39 @@ void PENRunAction::LEGENDOutput(const G4Run* aRun) {
 
 		if (ifRefresh == true) {
 			output
-				<< std::setw(10) << "Run ID" << '\t'
-				<< std::setw(10) << "Readout angle" << '\t'
-				<< std::setw(40) << "Number of Event" << '\t'
-				<< std::setw(40) << "Primary Particle" << '\t'
-				<< std::setw(40) << "Primary Energy(MeV)" << '\t'
-				<< std::setw(40) << "SiPMEventCount" << '\t'
-				<< std::setw(40) << "VetoEventCount" << '\t'
-				<< std::setw(40) << "BulkEventCount" << '\t'
-				<< std::setw(40) << "DetectableEventCount" << '\t'
-				<< std::setw(40) << "VetoPossibleEventCount" << '\t'
-				<< std::setw(40) << "VetoEfficiency" << '\t'
-				<< std::setw(40) << "ROIEventCount" << '\t'
-				<< std::setw(40) << "ROIVetoEventCount" << '\t'
-				<< std::setw(40) << "ROIVetoPossibleEventCount" << '\t'
-				<< std::setw(40) << "ROIVetoEfficiency" << '\t' << G4endl;
+				<< std::setw(10) << std::left << "Run ID" << '\t'
+				<< std::setw(40) << std::left << "Readout angle" << '\t'
+				<< std::setw(40) << std::left << "Number of Event" << '\t'
+				<< std::setw(40) << std::left << "Primary Particle" << '\t'
+				<< std::setw(40) << std::left << "Primary Energy(MeV)" << '\t'
+				<< std::setw(40) << std::left << "SiPMEventCount" << '\t'
+				<< std::setw(40) << std::left << "VetoEventCount" << '\t'
+				<< std::setw(40) << std::left << "BulkEventCount" << '\t'
+				<< std::setw(40) << std::left << "DetectableEventCount" << '\t'
+				<< std::setw(40) << std::left << "VetoPossibleEventCount" << '\t'
+				<< std::setw(40) << std::left << "VetoEfficiency" << '\t'
+				<< std::setw(40) << std::left << "ROIEventCount" << '\t'
+				<< std::setw(40) << std::left << "ROIVetoEventCount" << '\t'
+				<< std::setw(40) << std::left << "ROIVetoPossibleEventCount" << '\t'
+				<< std::setw(40) << std::left << "ROIVetoEfficiency" << '\t' << G4endl;
 		}
 
 		output
-			<< std::setw(10) << aRun->GetRunID() << '\t'
-			<< std::setw(40) << fDetCons->GetReadoutAngle() << '\t'
-			<< std::setw(40) << aRun->GetNumberOfEvent() << '\t'
-			<< std::setw(40) << fPrimaryGenerator->GetPrimaryName() << '\t'
-			<< std::setw(40) << std::setiosflags(std::ios::fixed) << std::setprecision(2) << fPrimaryGenerator->GetPrimaryE() << '\t'
-			<< std::setw(40) << SiPMEventCount.GetValue() << '\t'
-			<< std::setw(40) << VetoEventCount.GetValue() << '\t'
-			<< std::setw(40) << BulkEventCount.GetValue() << '\t'
-			<< std::setw(40) << DetectableEventCount.GetValue() << '\t'
-			<< std::setw(40) << VetoPossibleEvtCount.GetValue() << '\t'
-			<< std::setw(40) << eff << '\t'
-			<< std::setw(40) << ROIEventCount.GetValue() << '\t'
-			<< std::setw(40) << ROIVetoEventCount.GetValue() << '\t'
-			<< std::setw(40) << ROIVetoPossibleEvtCount.GetValue() << '\t'
-			<< std::setw(40) << ROIeff << G4endl;
+			<< std::setw(10) << std::left << aRun->GetRunID() << '\t'
+			<< std::setw(40) << std::left << fDetCons->GetReadoutAngle() << '\t'
+			<< std::setw(40) << std::left << aRun->GetNumberOfEvent() << '\t'
+			<< std::setw(40) << std::left << fPrimaryGenerator->GetPrimaryName() << '\t'
+			<< std::setw(40) << std::left << std::setiosflags(std::ios::fixed) << std::setprecision(2) << fPrimaryGenerator->GetPrimaryE() << '\t'
+			<< std::setw(40) << std::left << SiPMEventCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << VetoEventCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << BulkEventCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << DetectableEventCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << VetoPossibleEvtCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << eff << '\t'
+			<< std::setw(40) << std::left << ROIEventCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << ROIVetoEventCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << ROIVetoPossibleEvtCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << ROIeff << G4endl;
 		output.close();
 		//std::DecimalFormat df1 = new DecimalFormat("0.0");
 	}
