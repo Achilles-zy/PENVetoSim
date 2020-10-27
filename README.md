@@ -20,7 +20,7 @@ But if necessary you can basically put any string in the file name with this cmd
 
 root file name: Wiretype_Confine info_Layer number_Run ID
 
-/PEN/det/set/layernumber(int)
+/PEN/det/set/layernumber layerNb(int)
 
 current options: 1,2
 
@@ -42,7 +42,7 @@ Merged the function of self veto simulation and active veto simulation
 
 Added macro
 
-/PEN/src/type/SrcType(string)
+/PEN/src/type SrcType(string)
 
 current options: Wire/PENShell
 
@@ -53,3 +53,47 @@ Src is uniformly distributed in the "Wire" volume
 PENShell is for self-veto simulation
 
 Src is uniformly distributed in the "PENShell" volume
+
+
+
+10/21
+
+/PEN/sim/set/mode Mode(string)
+
+Current option: CDEX/LEGEND
+
+
+
+10/23
+
+/PEN/run/refresh IfRefresh(bool)
+
+Set if refresh the output txt, works for LEGEND mode
+
+
+
+/LEGEND/readout/angle Angle(Readout angle in degree)
+
+
+
+/LEGEND/src/pos Srcpos(string)
+
+current options: Side/Bottom/Shroud
+
+
+
+/PEN/mat/set/PENpropertiesID ID(int)
+
+current options:
+
+0: LY=3000 ph/MeV, abs at 450 nm=15.52 mm, first result from Luis
+
+1: LY=3500 ph/MeV, abs at 450 nm=40 mm
+
+2: LY=6000 ph/MeV, abs at 450 nm=100 mm
+
+
+
+10/27
+
+Fixed bugs in .txt and .root output files.
