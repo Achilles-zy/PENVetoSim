@@ -97,9 +97,11 @@ PENDetectorConstruction::PENDetectorConstruction():
 	fPENShellRadius = 5 * cm;
 	fReadoutAngle = 360;
 	fPENPropertiesID = 1;
-	absFactor = 1;
+	absFactor = 1.5;
 	G4cout << "Start Construction" << G4endl;
-
+	DefineMat();
+	fTargetMaterial = G4Material::GetMaterial("PVT_structure");
+	fGlassMaterialPMT = G4Material::GetMaterial("BorosilicateGlass");
 }
 
 PENDetectorConstruction::~PENDetectorConstruction()
@@ -188,18 +190,7 @@ void PENDetectorConstruction::DefineMat()
 	G4double RINDEX_PEN[102] = { 0 };
 
 	G4int absEntries = 0;
-	if (fPENPropertiesID == 0) {
-		fLY = 3000. / MeV;
-		absFactor = 1;
-	}
-	else if (fPENPropertiesID == 1) {
-		fLY = 3500. / MeV;
-		absFactor = 2.58;
-	}
-	else if (fPENPropertiesID == 2) {
-		fLY = 6000. / MeV;
-		absFactor = 6.44;
-	}
+
 	ifstream ReadAbs;
 
 	G4String absFile = "../input_files/" + fABSFile + ".csv";
@@ -213,7 +204,7 @@ void PENDetectorConstruction::DefineMat()
 				break;
 			}
 			wlPhotonEnergy[absEntries] = (1240. / wavelength) * eV;
-			ABSORPTION_PEN[absEntries] = (varAbsorLength * absFactor) * mm;
+			ABSORPTION_PEN[absEntries] = (varAbsorLength) * mm;
 			RINDEX_PEN[absEntries] = rindex;
 			absEntries++;
 		}
@@ -504,12 +495,34 @@ void PENDetectorConstruction::SetABS(G4double value) {
 #endif
 }
 
+void PENDetectorConstruction::SetLY(G4double ly) {
+
+	MPT_PEN->AddConstProperty("SCINTILLATIONYIELD", ly / MeV); // * 2.5 * PEN = PS, 10*PEN=PS
+//G4RunManager::GetRunManager()->PhysicsHasBeenModified();
+#ifdef G4MULTITHREADED
+	G4MTRunManager::GetRunManager()->PhysicsHasBeenModified();
+#else
+	G4RunManager::GetRunManager()->PhysicsHasBeenModified();
+#endif
+}
+
 G4VPhysicalVolume* PENDetectorConstruction::Construct()
 {
-	DefineMat();
-	fTargetMaterial = G4Material::GetMaterial("PVT_structure");
-	fGlassMaterialPMT = G4Material::GetMaterial("BorosilicateGlass");
-	SetABS(AbsorptionLength);
+	if (fPENPropertiesID == 0) {
+		fLY = 6000. / MeV;
+		absFactor = 1.5;
+	}
+	else if (fPENPropertiesID == 1) {
+		fLY = 3500. / MeV;
+		absFactor = 2.58;
+	}
+	else if (fPENPropertiesID == 2) {
+		fLY = 6000. / MeV;
+		absFactor = 6.44;
+	}
+	SetABS(absFactor);
+	SetLY(fLY);
+
 	if (fMode == "CDEX") {
 		return ConstructCDEX();
 	}

@@ -89,8 +89,8 @@ void PENRunAction::BeginOfRunAction(const G4Run* aRun)
 	  txtname = "LEGEND_" + fDetCons->GetRunInfo();
   }
 
-  //analysisManager->SetFileName(fileName);
-  analysisManager->OpenFile(fileName);
+  //analysisManager->OpenFile(fileName);
+  analysisManager->OpenFile(filename);
 
   G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
   accumulableManager->Reset();
@@ -131,8 +131,14 @@ void PENRunAction::EndOfRunAction(const G4Run* aRun)
 	  G4cout << "ERRRO! Mode does not exsist, nothing to output!" << G4endl;
   }
   ifRefresh = false;
+  G4String fileName0 = filename + ".root";
+  G4String fileName1 = filename + "_" + fPrimaryGenerator->GetPrimaryName() + ".root";
+  //analysisManager->SetFileName(filename);
   analysisManager->Write();
   analysisManager->CloseFile();
+  if (G4RunManager::GetRunManager()->GetRunManagerType() == 1) {
+	  std::rename(fileName0, fileName1);
+  }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

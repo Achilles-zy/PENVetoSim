@@ -38,6 +38,7 @@ class PENDetectorConstruction : public G4VUserDetectorConstruction
         void DefineMat();
 
         void SetABS(G4double);
+        void SetLY(G4double);
         void SetWireType(G4String);
         void SetConfine(G4String);
         void SetRunInfo(G4String);
