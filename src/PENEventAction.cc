@@ -98,8 +98,17 @@ void PENEventAction::EndOfEventAction(const G4Event* evt)
 		run->CountVetoEvent();
     }
 
+    if (edepBulk > 0 && SiPMPhotonCount > 5) {
+        run->CountVetoEvent_1();
+    }
+
+    if (edepBulk > 0 && SiPMPhotonCount > 10) {
+        run->CountVetoEvent_2();
+    }
+
 	if (edepBulk > 0) {
 		run->CountBulkEvent();
+        analysisManager->FillH1(3, SiPMPhotonCount);
 	}
 
 	if (SiPMPhotonCount > 0) {
@@ -114,7 +123,7 @@ void PENEventAction::EndOfEventAction(const G4Event* evt)
         run->CountVetoPossibleEvent();
     }
 
-    if (edepBulk > 2200 * keV && edepBulk < 2400 * keV) {
+    if (edepBulk > 2000 * keV && edepBulk < 2100 * keV) {
         run->CountROIEvent();
 
         if (SiPMPhotonCount > 0) {

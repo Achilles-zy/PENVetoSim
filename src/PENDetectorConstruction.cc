@@ -10,6 +10,7 @@
 #include "G4Torus.hh"
 #include "G4Sphere.hh"
 #include "G4Trd.hh"
+#include "G4Hype.hh"
 #include "G4EllipticalCone.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
@@ -86,7 +87,7 @@ PENDetectorConstruction::PENDetectorConstruction():
 	fABSFile = "PEN_ABS";
 	fConfine = "Wire";
 	fType = "A1";
-	fMode = "LEGEND";
+	fMode = "CDEX";
 	fLayerNb = 2;
 	fWirePos = G4ThreeVector();
 	fWireRadius = 0.7 * mm;
@@ -855,7 +856,33 @@ G4VPhysicalVolume* PENDetectorConstruction::ConstructCDEX()
 	  auto solidPENShell_0 = new G4Tubs("solidPENShell_0", outerGeRadius + LN2Gap, outerGeRadius + LN2Gap + ShellThickness, PENShellHeight / 2, 0., twopi);
 	  auto solidPENShell_1 = new G4Tubs("solidPENShell_1", outerGeRadius + LN2Gap + ShellThickness + wireradius * 2, outerGeRadius + LN2Gap + ShellThickness + wireradius * 2 + ShellThickness, PENShellHeight / 2, 0., twopi);
 	  auto solidLG1 = new G4EllipticalCone("solidLG1", 1, 1, (outerGeRadius + LN2Gap + ShellThickness + wireradius * 2 + ShellThickness + 1 * cm) / 2, 2 * cm);
-	  auto solidLG2 = new G4EllipticalCone("solidLG1", 1, 1, (outerGeRadius + LN2Gap + ShellThickness + wireradius * 2 + ShellThickness + 1 * cm) / 2, 2 * cm);
+	  auto solidLG2 = new G4EllipticalCone("solidLG2", 1, 1, (outerGeRadius + LN2Gap + ShellThickness + wireradius * 2 + ShellThickness + 1 * cm) / 2, 2 * cm);
+	  
+	  G4double aLength = 3 * cm;
+	  G4double aRadius = 1 * cm;
+	  G4double HLength = 12 * cm;
+	  G4double aAngle = twopi / 15;
+	  G4double boxl = 10 * cm;
+	  auto box = new G4Box("box", boxl, boxl, boxl);
+	  auto solidH1Temp = new G4Hype("solidH1Temp",
+		  aRadius,
+		  aRadius+1*cm,
+		  aAngle,
+		  aAngle,
+		  HLength);
+	  auto solidH1 = new G4SubtractionSolid("solidH1", solidH1Temp, box, 0, G4ThreeVector(0., 0., boxl - 2 * cm));
+
+	  auto solidH2Temp = new G4Hype("solidH2Temp",
+		  aRadius,
+		  aRadius + 1 * cm,
+		  aAngle,
+		  aAngle,
+		  HLength);
+	  auto solidH2 = new G4SubtractionSolid("solidH2", solidH2Temp, box, 0, G4ThreeVector(0., 0., boxl -2*cm));
+	  //auto solidLG1 = new G4EllipticalCone("solidLG1", 1, 1, PENShellHeight/2, 3 * cm);
+	  //auto solidLG2 = new G4EllipticalCone("solidLG2", 1, 1, PENShellHeight/2, 3 * cm);
+
+	  
 	  //auto logicLG1 = new G4LogicalVolume(solidLG1, matPEN, "logicLG1");
 	  //auto physLG1 = new G4PVPlacement(0, G4ThreeVector(10 * cm, 0, 0), logicLG1, "LG1", logicEnv, false, 0, checkOverlaps);
 
@@ -869,8 +896,8 @@ G4VPhysicalVolume* PENDetectorConstruction::ConstructCDEX()
 	  G4RotationMatrix rotm1 = G4RotationMatrix(u, v, w);
 	  G4ThreeVector position0 = G4ThreeVector(0., 0., 0.);
 	  G4ThreeVector position1 = G4ThreeVector(0., 0., 0.);
-	  G4ThreeVector position2 = G4ThreeVector(0., 0., PENShellHeight / 2 + 2 * cm);
-	  G4ThreeVector position3 = G4ThreeVector(0., 0., -PENShellHeight / 2 - 2 * cm);
+	  G4ThreeVector position2 = G4ThreeVector(0., 0., PENShellHeight / 2 + HLength);
+	  G4ThreeVector position3 = G4ThreeVector(0., 0., -PENShellHeight / 2 - HLength);
 	  G4Transform3D tr0 = G4Transform3D(rotm, position0);
 	  G4Transform3D tr1 = G4Transform3D(rotm, position1);
 	  G4Transform3D tr2 = G4Transform3D(rotm, position2);
@@ -878,8 +905,8 @@ G4VPhysicalVolume* PENDetectorConstruction::ConstructCDEX()
 
 	  solidPENShell->AddNode(*solidPENShell_0, tr0);
 	  solidPENShell->AddNode(*solidPENShell_1, tr1);
-	  solidPENShell->AddNode(*solidLG1, tr2);
-	  solidPENShell->AddNode(*solidLG2, tr3);
+	  solidPENShell->AddNode(*solidH1, tr2);
+	  solidPENShell->AddNode(*solidH2, tr3);
 
 	  // Finally close the structure
 	  //
@@ -930,32 +957,33 @@ G4VPhysicalVolume* PENDetectorConstruction::ConstructCDEX()
   G4double xyAngle0 = InitAug + AngStep * 0;
   auto rotSiPM0 = new G4RotationMatrix();
   rotSiPM0->rotateZ(xyAngle0);
-  physSiPM0 = new G4PVPlacement(rotSiPM0, G4ThreeVector(SiPMtoCenDist * cos(xyAngle0), SiPMtoCenDist * sin(-xyAngle0), 0), logicSiPM, "SiPM0", logicEnv, false, 0, checkOverlaps);
 
   G4double xyAngle1 = InitAug + AngStep * 1;
   auto rotSiPM1 = new G4RotationMatrix();
   rotSiPM1->rotateZ(xyAngle1);
-  physSiPM1 = new G4PVPlacement(rotSiPM1, G4ThreeVector(SiPMtoCenDist * cos(xyAngle1), SiPMtoCenDist * sin(-xyAngle1), 0), logicSiPM, "SiPM1", logicEnv, false, 1, checkOverlaps);
 
   G4double xyAngle2 = InitAug + AngStep * 2;
   auto rotSiPM2 = new G4RotationMatrix();
   rotSiPM2->rotateZ(xyAngle2);
-  physSiPM2 = new G4PVPlacement(rotSiPM2, G4ThreeVector(SiPMtoCenDist * cos(xyAngle2), SiPMtoCenDist * sin(-xyAngle2), 0), logicSiPM, "SiPM2", logicEnv, false, 2, checkOverlaps);
 
   G4double xyAngle3 = InitAug + AngStep * 3;
   auto rotSiPM3 = new G4RotationMatrix();
   rotSiPM3->rotateZ(xyAngle3);
-  physSiPM3 = new G4PVPlacement(rotSiPM3, G4ThreeVector(SiPMtoCenDist * cos(xyAngle3), SiPMtoCenDist * sin(-xyAngle3), 0), logicSiPM, "SiPM3", logicEnv, false, 3, checkOverlaps);
 
   G4double xyAngle4 = InitAug + AngStep * 4;
   auto rotSiPM4 = new G4RotationMatrix();
   rotSiPM4->rotateZ(xyAngle4);
-  physSiPM4 = new G4PVPlacement(rotSiPM4, G4ThreeVector(SiPMtoCenDist * cos(xyAngle4), SiPMtoCenDist * sin(-xyAngle4), 0), logicSiPM, "SiPM4", logicEnv, false, 4, checkOverlaps);
 
   G4double xyAngle5 = InitAug + AngStep * 5;
   auto rotSiPM5 = new G4RotationMatrix();
   rotSiPM5->rotateZ(xyAngle5);
-  physSiPM5 = new G4PVPlacement(rotSiPM5, G4ThreeVector(SiPMtoCenDist * cos(xyAngle5), SiPMtoCenDist * sin(-xyAngle5), 0), logicSiPM, "SiPM5", logicEnv, false, 5, checkOverlaps);
+
+  //physSiPM0 = new G4PVPlacement(rotSiPM0, G4ThreeVector(SiPMtoCenDist * cos(xyAngle0), SiPMtoCenDist * sin(-xyAngle0), 0), logicSiPM, "SiPM0", logicEnv, false, 0, checkOverlaps);
+  //physSiPM1 = new G4PVPlacement(rotSiPM1, G4ThreeVector(SiPMtoCenDist * cos(xyAngle1), SiPMtoCenDist * sin(-xyAngle1), 0), logicSiPM, "SiPM1", logicEnv, false, 1, checkOverlaps);
+  //physSiPM2 = new G4PVPlacement(rotSiPM2, G4ThreeVector(SiPMtoCenDist * cos(xyAngle2), SiPMtoCenDist * sin(-xyAngle2), 0), logicSiPM, "SiPM2", logicEnv, false, 2, checkOverlaps);
+  //physSiPM3 = new G4PVPlacement(rotSiPM3, G4ThreeVector(SiPMtoCenDist * cos(xyAngle3), SiPMtoCenDist * sin(-xyAngle3), 0), logicSiPM, "SiPM3", logicEnv, false, 3, checkOverlaps);
+  //physSiPM4 = new G4PVPlacement(rotSiPM4, G4ThreeVector(SiPMtoCenDist * cos(xyAngle4), SiPMtoCenDist * sin(-xyAngle4), 0), logicSiPM, "SiPM4", logicEnv, false, 4, checkOverlaps);
+  //physSiPM5 = new G4PVPlacement(rotSiPM5, G4ThreeVector(SiPMtoCenDist * cos(xyAngle5), SiPMtoCenDist * sin(-xyAngle5), 0), logicSiPM, "SiPM5", logicEnv, false, 5, checkOverlaps);
 
  // G4Box* solidSiPM_P = new G4Box("SiPM_box", SiPM_L / 2, SiPM_L / 2, SiPM_L / 2);
  // G4LogicalVolume* logicSiPM_P = new G4LogicalVolume(solidSiPM_P, matSi, "SiPM_log");
@@ -1058,8 +1086,8 @@ G4VPhysicalVolume* PENDetectorConstruction::ConstructCDEX()
   if (LayerNb == 2) {
 	  auto solidSideSiPM_1 = new G4Tubs("solidSideSiPM_1", 0, 1 * cm, SiPM_D / 2, 0 * degree, 360 * degree);
 	  G4LogicalVolume* logicSideSiPM_1 = new G4LogicalVolume(solidSideSiPM_1, matSi, "logicSideSiPM_1");
-	  physSiPM12 = new G4PVPlacement(0, G4ThreeVector(0, 0, PENShellHeight / 2 + 4.5 * cm), logicSideSiPM_1, "SiPM12", logicEnv, false, 0, checkOverlaps);
-	  physSiPM13 = new G4PVPlacement(0, G4ThreeVector(0, 0, -PENShellHeight / 2 - 4.5 * cm), logicSideSiPM_1, "SiPM13", logicEnv, false, 0, checkOverlaps);
+	  physSiPM12 = new G4PVPlacement(0, G4ThreeVector(0, 0, PENShellHeight / 2 + 10 * cm), logicSideSiPM_1, "SiPM12", logicEnv, false, 0, checkOverlaps);
+	  physSiPM13 = new G4PVPlacement(0, G4ThreeVector(0, 0, -PENShellHeight / 2 - 10 * cm), logicSideSiPM_1, "SiPM13", logicEnv, false, 0, checkOverlaps);
 
   }
 

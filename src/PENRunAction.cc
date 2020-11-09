@@ -14,6 +14,8 @@ PENRunAction::PENRunAction(PENPrimaryGeneratorAction* gen, PENDetectorConstructi
 	SiPMEventCount(0),
 	BulkEventCount(0),
 	VetoEventCount(0),
+	VetoEventCount_1(0),
+	VetoEventCount_2(0),
 	DetectableEventCount(0),
 	VetoPossibleEvtCount(0),
 	ROIEventCount(0),
@@ -29,6 +31,7 @@ PENRunAction::PENRunAction(PENPrimaryGeneratorAction* gen, PENDetectorConstructi
   analysisManager->CreateH1("edepBulk", "Edep in Bulk", 200, 0 * keV, 20 * keV);
   analysisManager->CreateH1("PhotonCount", "Photon Count", 1000, 0, 3000);
   analysisManager->CreateH1("PhotonCount2", "Photon Count", 100, 0, 100);
+  analysisManager->CreateH1("VetoPhotonCount", "Photon Count", 100, 0, 3000);
 
 
   analysisManager->CreateNtuple("RunRes", "EventCount");
@@ -50,6 +53,8 @@ PENRunAction::PENRunAction(PENPrimaryGeneratorAction* gen, PENDetectorConstructi
   G4AccumulableManager* accumulableManager = G4AccumulableManager::Instance();
   accumulableManager->RegisterAccumulable(SiPMEventCount);
   accumulableManager->RegisterAccumulable(VetoEventCount);
+  accumulableManager->RegisterAccumulable(VetoEventCount_1);
+  accumulableManager->RegisterAccumulable(VetoEventCount_2);
   accumulableManager->RegisterAccumulable(BulkEventCount);
   accumulableManager->RegisterAccumulable(DetectableEventCount);
   accumulableManager->RegisterAccumulable(VetoPossibleEvtCount);
@@ -150,6 +155,8 @@ void PENRunAction::CDEXOutput(const G4Run* aRun) {
 		G4cout << G4endl;
 		G4cout << G4endl;
 		G4cout << "VetoEventCount =" << VetoEventCount.GetValue() << G4endl;
+		G4cout << "VetoEventCount_1 =" << VetoEventCount_1.GetValue() << G4endl;
+		G4cout << "VetoEventCount_2 =" << VetoEventCount_2.GetValue() << G4endl;
 		G4cout << "SiPMEventCount =" << SiPMEventCount.GetValue() << G4endl;
 		G4cout << "BulkEventCount =" << BulkEventCount.GetValue() << G4endl;
 		G4cout << "DetectableEventCount =" << DetectableEventCount.GetValue() << G4endl;
@@ -200,6 +207,8 @@ void PENRunAction::CDEXOutput(const G4Run* aRun) {
 				<< std::setw(40) << std::left << "Primary Energy(MeV)" << '\t'
 				<< std::setw(40) << std::left << "SiPMEventCount" << '\t'
 				<< std::setw(40) << std::left << "VetoEventCount" << '\t'
+				<< std::setw(40) << std::left << "VetoEventCount_1" << '\t'
+				<< std::setw(40) << std::left << "VetoEventCount_2" << '\t'
 				<< std::setw(40) << std::left << "BulkEventCount" << '\t'
 				<< std::setw(40) << std::left << "DetectableEventCount" << '\t'
 				<< std::setw(40) << std::left << "VetoPossibleEventCount" << '\t'
@@ -217,6 +226,8 @@ void PENRunAction::CDEXOutput(const G4Run* aRun) {
 			<< std::setw(40) << std::left << std::setiosflags(std::ios::fixed) << std::setprecision(2) << fPrimaryGenerator->GetPrimaryE() << '\t'
 			<< std::setw(40) << std::left << SiPMEventCount.GetValue() << '\t'
 			<< std::setw(40) << std::left << VetoEventCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << VetoEventCount_1.GetValue() << '\t'
+			<< std::setw(40) << std::left << VetoEventCount_2.GetValue() << '\t'
 			<< std::setw(40) << std::left << BulkEventCount.GetValue() << '\t'
 			<< std::setw(40) << std::left << DetectableEventCount.GetValue() << '\t'
 			<< std::setw(40) << std::left << VetoPossibleEvtCount.GetValue() << '\t'
@@ -239,6 +250,8 @@ void PENRunAction::LEGENDOutput(const G4Run* aRun) {
 		G4cout << G4endl;
 		G4cout << "ReadoutAngle =" << fDetCons->GetReadoutAngle() << G4endl;
 		G4cout << "VetoEventCount =" << VetoEventCount.GetValue() << G4endl;
+		G4cout << "VetoEventCount_1 =" << VetoEventCount_1.GetValue() << G4endl;
+		G4cout << "VetoEventCount_2 =" << VetoEventCount_2.GetValue() << G4endl;
 		G4cout << "SiPMEventCount =" << SiPMEventCount.GetValue() << G4endl;
 		G4cout << "BulkEventCount =" << BulkEventCount.GetValue() << G4endl;
 		G4cout << "DetectableEventCount =" << DetectableEventCount.GetValue() << G4endl;
@@ -288,6 +301,8 @@ void PENRunAction::LEGENDOutput(const G4Run* aRun) {
 				<< std::setw(40) << std::left << "Primary Energy(MeV)" << '\t'
 				<< std::setw(40) << std::left << "SiPMEventCount" << '\t'
 				<< std::setw(40) << std::left << "VetoEventCount" << '\t'
+				<< std::setw(40) << std::left << "VetoEventCount_1" << '\t'
+				<< std::setw(40) << std::left << "VetoEventCount_2" << '\t'
 				<< std::setw(40) << std::left << "BulkEventCount" << '\t'
 				<< std::setw(40) << std::left << "DetectableEventCount" << '\t'
 				<< std::setw(40) << std::left << "VetoPossibleEventCount" << '\t'
@@ -306,6 +321,8 @@ void PENRunAction::LEGENDOutput(const G4Run* aRun) {
 			<< std::setw(40) << std::left << std::setiosflags(std::ios::fixed) << std::setprecision(2) << fPrimaryGenerator->GetPrimaryE() << '\t'
 			<< std::setw(40) << std::left << SiPMEventCount.GetValue() << '\t'
 			<< std::setw(40) << std::left << VetoEventCount.GetValue() << '\t'
+			<< std::setw(40) << std::left << VetoEventCount_1.GetValue() << '\t'
+			<< std::setw(40) << std::left << VetoEventCount_2.GetValue() << '\t'
 			<< std::setw(40) << std::left << BulkEventCount.GetValue() << '\t'
 			<< std::setw(40) << std::left << DetectableEventCount.GetValue() << '\t'
 			<< std::setw(40) << std::left << VetoPossibleEvtCount.GetValue() << '\t'
